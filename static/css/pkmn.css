@@ -1,0 +1,15 @@
+.pkmn{
+    background-color: red;
+    display: inline-block;
+    width: 125px;
+    height: 125px;
+    margin-top: -4px;
+}
+
+#pkmns input[type=checkbox]{
+    display: none;
+}
+
+#pkmns input[type=checkbox]:checked + .pkmn{
+    background-color: green;
+}

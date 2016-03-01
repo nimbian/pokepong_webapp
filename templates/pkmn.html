@@ -1,0 +1,26 @@
+<!doctype html>
+<head>
+	<link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/pkmn.css') }}>
+	<link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/jquery-ui.min.css') }}>
+	<link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/stylesheet.css') }}>
+	<link rel="shortcut icon" href= {{ url_for('static', filename = 'images/favicon.ico') }}>
+	<script src= {{ url_for('static', filename = 'js/pkmn.js') }}></script>
+	<script src= {{ url_for('static', filename = 'js/jquery-2.2.0.min.js') }}></script>
+	<script src= {{ url_for('static', filename = 'js/jquery-ui.min.js') }}></script>
+</head>
+
+<body>
+	<img src= {{url_for('static', filename = 'images/logo.png')}} align="middle">
+	<div class="form-group">
+		<label for="usr">Team Name:</label>
+		<input type="text" id="usr">
+	</div>
+	<input type="button" id="sub1" value="Submit!"></button>
+	<input type="button" id="rand" value="Randomize Team!"></button>
+	<form id="pkmns"></form>
+	<input type="button" id="sub2" value="Submit!"></button>
+	<script src= {{ url_for('static', filename = 'js/script.js') }}></script>
+	<script src= {{ url_for('static', filename = 'js/pics.js') }}></script>
+</body>
+
+</html>
