@@ -1,0 +1,29 @@
+[meta]
+# enviornment=prod for deployed instances
+environment=dev
+
+[dev]
+# The displayed name of this site
+# The displayed name of this site
+site-name=pokepong.net
+# Change this to the actual location of your site
+protocol=http
+domain=localhost:5000
+# Set to true to recompile resources on every request
+# Turn this off in productio
+debug-static-recompile=false
+# Change this value to something random and secret
+secret-key=hello world
+
+
+# On the debug server, this lets you choose what to bind to
+debug-host=0.0.0.0
+debug-port=5000
+
+# SQL connection string
+connection-string=sqlite:///pong.db
+
+
+# Redis connection string
+# http://docs.celeryproject.org/en/3.0/getting-started/brokers/redis.html
+redis-connection=redis://localhost:6379/0
