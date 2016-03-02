@@ -1,6 +1,8 @@
 from flask import Flask, render_template, redirect, request, jsonify
 from time import sleep
 from pokepong.forms import Register
+from pokepong.models import Trainer
+from pokepong.database import db
 import sqlite3
 conn = sqlite3.connect('teams.db')
 c = conn.cursor()
@@ -51,7 +53,18 @@ def redir():
 def register():
     form = Register()
     if form.validate_on_submit():
-        print "yes"
+        trainer = Trainer.query.filter_by(username=form.username.data).first()
+        if trainer:
+            print trainer
+            #Should look into flashing username already taken.
+            return render_template('register.html', form=form)
+        if form.password1.data != form.password2.data:
+            print 'non-pass match'
+            #Should look into doing some banner flash in flask
+            return render_template('register.html', form=form)
+        newuser = Trainer(form.username.data, form.password1.data)
+        db.add(newuser)
+        db.commit()
     return render_template('register.html', form=form)
 
 
