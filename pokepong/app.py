@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, request, jsonify
 from time import sleep
+from pokepong.forms import Register
 import sqlite3
 conn = sqlite3.connect('teams.db')
 c = conn.cursor()
@@ -11,6 +12,7 @@ except:
     pass
 c.close()
 app = Flask(__name__)
+
 
 @app.route("/")
 def master():
@@ -44,6 +46,14 @@ def check_user():
 @app.route("/redirect")
 def redir():
     return render_template('redirect.html')
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    form = Register()
+    if form.validate_on_submit():
+        print "yes"
+    return render_template('register.html', form=form)
+
 
 if __name__ == "__main__":
     app.debug = True
