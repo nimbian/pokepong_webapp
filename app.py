@@ -1,5 +1,5 @@
 from pokepong.app import app
-from pokepong.config import _cfg, _cfgi, _cfgb
+from pokepong.config import _cfg, _cfgi
 
 if __name__ == '__main__':
     app.secret_key = _cfg("secret-key")
