@@ -1,18 +1,16 @@
-from pokepong.app import app
-from pokepong.config import _cfg, _cfgi
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, Integer, String, Unicode, Boolean, DateTime, ForeignKey, Table, UnicodeText, Text, text
+from sqlalchemy.orm import relationship, backref
+from .database import Base
 from datetime import datetime
 import bcrypt
 
-app.config['SQLALCHEMY_DATABASE_URI'] = _cfg('connection-string')
-db = SQLAlchemy(app)
-
-class Trainer(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True, nullable=False)
-    password = db.Column(db.String)
-    admin = db.Column(db.Boolean)
-    created = db.Column(db.DateTime)
+class Trainer(Base):
+    __tablename__ = 'trainer'
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True, nullable=False)
+    password = Column(String)
+    admin = Column(Boolean)
+    created = Column(DateTime)
 
     def __init__(self, username, password, admin=False):
         self.username = username
