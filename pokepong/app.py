@@ -129,7 +129,7 @@ def battle():
                     'pokemon': form.pokemon.data}
         r.rpush('linup', newteam)
         return redirect(url_for('accepted'))
-    return render_template('battle' form=form)
+    return render_template('battle', form=form)
 
 if __name__ == "__main__":
     app.debug = True
