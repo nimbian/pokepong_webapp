@@ -15,5 +15,6 @@ class PartySignup(Form):
     teamname = StringField('teamname', validators=[DataRequired()])
 
 class BattleSignup(Form):
-    teamname = SelectField('teamname', validators=[DataRequired()])
+    #should add a validator to check no more than 6 pokemon are selected
+    pokemon = SelectMultipleField('teamname', validators=[DataRequired()])
 
