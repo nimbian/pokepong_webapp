@@ -102,23 +102,34 @@ def signup():
     form = PartySignup()
     #TODO: move enums to Server model.
     if mode == 'party' and form.validate_on_submit():
+        #should put first 150 pokemon in the all pokemon list and just use
+        #that for annonimous users.
         newteam = {'name' : form.teamname.data,
                    'pokemon': None}
         r.rpush('lineup', newteam)
         return redirect(url_for('accepted'))
     elif mode == 'battle':
         return redirect(url_for('battle'))
-    return render_template('signup.html')
+    return render_template('signup.html', form=form)
 
 @app.route("/battle", methods=['GET, POST'])
 @login_required
 def battle():
-    #unfinished
-
-    form.teamname.choices = [(trainer.id, trainer.username)
-                                for t in Trainer.query.order_by('username')]
-    newteam = {'name' : form.teamname.data,
-                'pokemon': form.pokemon.data}
+    mode = Server.query.first().mode
+    if mode != 'battle':
+        #popup something about changing the gametype
+        pass
+    form = BattleSignup()
+    if form.validate_on_submit():
+        #"pokemon" relationship does not currently exist in the user model,
+        #need to make
+        form.pokemon.choices = [(pokemon.id, pokemon.name)
+                                    for pokemon in current_user.pokemon]
+        newteam = {'name' : current_user.uesrname,
+                    'pokemon': form.pokemon.data}
+        r.rpush('linup', newteam)
+        return redirect(url_for('accepted'))
+    return render_template('battle' form=form)
 
 if __name__ == "__main__":
     app.debug = True
