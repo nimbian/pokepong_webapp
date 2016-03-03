@@ -1,10 +1,11 @@
 from sqlalchemy import Column, Integer, String, Unicode, Boolean, DateTime, ForeignKey, Table, UnicodeText, Text, text
 from sqlalchemy.orm import relationship, backref
+from flask.ext.login import UserMixin
 from .database import Base
 from datetime import datetime
 import bcrypt
 
-class Trainer(Base):
+class Trainer(Base, UserMixin):
     __tablename__ = 'trainer'
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
@@ -21,4 +22,14 @@ class Trainer(Base):
     def set_password(self, password):
         self.password = bcrypt.hashpw(password.encode('utf-8'),
                                       bcrypt.gensalt()).decode('utf-8')
+
+    def check_password(self, password):
+        return bcrypt.hashpw(password.encode('utf-8'),
+                             self.password.encode('utf-8')) == self.password.encode('utf-8')
+
+
+class Server(Base):
+    __tablename__ = 'server'
+    id = Column(Integer, primary_key=True)
+    mode = Column(String)
 
