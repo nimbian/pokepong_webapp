@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, request, jsonify, url_for
 from flask.ext.login import current_user, login_user, logout_user, LoginManager, login_required
 from time import sleep
-from pokepong.forms import Register, Login
+from pokepong.forms import Register, Login, PartySignup, BattleSignup
 from pokepong.models import Trainer
 from pokepong.database import db
 from pokepong.redis import r
