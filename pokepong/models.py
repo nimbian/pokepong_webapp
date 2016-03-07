@@ -33,3 +33,10 @@ class Server(Base):
     id = Column(Integer, primary_key=True)
     mode = Column(String)
 
+class Pokemon(db.model):
+    #likely need at least a name, level and associated trainer
+    pass
+
+class Item(db.model):
+    #likely just link item id in complete item db to trainer(2 relationships)
+    pass
