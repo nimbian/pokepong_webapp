@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div id="content">
+            <form method="POST" action="/register">
+                {{ form.hidden_tag() }}
+                {{ form.username.label }} {{ form.username }}
+                {{ form.password1.label }} {{ form.password1 }}
+                {{ form.password2.label }} {{ form.password2 }}
+                <input type="submit" value="Go">
+            </form>
+        </div>
+    </body>
+</html>

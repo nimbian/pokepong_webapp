@@ -1,18 +1,17 @@
-from pokepong.app import app
-from pokepong.config import _cfg, _cfgi
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, Integer, String, Unicode, Boolean, DateTime, ForeignKey, Table, UnicodeText, Text, text
+from sqlalchemy.orm import relationship, backref
+from flask.ext.login import UserMixin
+from .database import Base
 from datetime import datetime
 import bcrypt
 
-app.config['SQLALCHEMY_DATABASE_URI'] = _cfg('connection-string')
-db = SQLAlchemy(app)
-
-class Trainer(db.model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True, Nullable=False)
-    password = db.Column(db.String)
-    admin = Column(db.Boolean)
-    created = Column(db.DateTime)
+class Trainer(Base, UserMixin):
+    __tablename__ = 'trainer'
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True, nullable=False)
+    password = Column(String)
+    admin = Column(Boolean)
+    created = Column(DateTime)
 
     def __init__(self, username, password, admin=False):
         self.username = username
@@ -24,10 +23,20 @@ class Trainer(db.model):
         self.password = bcrypt.hashpw(password.encode('utf-8'),
                                       bcrypt.gensalt()).decode('utf-8')
 
-class Pokemon(db.model):
+    def check_password(self, password):
+        return bcrypt.hashpw(password.encode('utf-8'),
+                             self.password.encode('utf-8')) == self.password.encode('utf-8')
+
+
+class Server(Base):
+    __tablename__ = 'server'
+    id = Column(Integer, primary_key=True)
+    mode = Column(String)
+
+class Pokemon(Base):
     #likely need at least a name, level and associated trainer
     pass
 
-class Item(db.model):
+class Item(Base):
     #likely just link item id in complete item db to trainer(2 relationships)
     pass
