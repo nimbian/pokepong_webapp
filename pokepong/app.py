@@ -18,6 +18,7 @@ c.close()
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "login"
 
 @login_manager.user_loader
 def load_user(trainer_id):
@@ -130,6 +131,16 @@ def battle():
         r.rpush('linup', newteam)
         return redirect(url_for('accepted'))
     return render_template('battle', form=form)
+
+@app.route("/admin/manage", methods=['GET', 'POST'])
+@login_required
+def manage():
+    if not current_user.admin:
+        #404 unauthorized or you are not an admin page or something.
+        pass
+    form = Server()
+    if form.validate_on_submit():
+
 
 if __name__ == "__main__":
     app.debug = True
