@@ -140,6 +140,7 @@ def manage():
         pass
     form = Server()
     if form.validate_on_submit():
+        pass
 
 
 if __name__ == "__main__":
