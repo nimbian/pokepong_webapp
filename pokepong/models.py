@@ -34,9 +34,11 @@ class Server(Base):
     mode = Column(String)
 
 class Pokemon(Base):
+    __tablename__ = 'pokemon'
     #likely need at least a name, level and associated trainer
-    pass
+    id = Column(Integer, primary_key=True)
 
 class Item(Base):
+    __tablename__ = 'item'
     #likely just link item id in complete item db to trainer(2 relationships)
-    pass
+    id = Column(Integer, primary_key=True)
