@@ -35,8 +35,30 @@ class Server(Base):
 
 class Pokemon(Base):
     __tablename__ = 'pokemon'
-    #likely need at least a name, level and associated trainer
     id = Column(Integer, primary_key=True)
+    owner_id = Column(Integer, ForeignKey('trainer.id'))
+    owner = relationship('Trainer',
+                         backref=backref('pokemon', lazy='dynamic'))
+    name = Column(String)
+    move1 =Column(String)
+    move2 =Column(String)
+    move3 =Column(String)
+    move4 =Column(String)
+    lvl = Column(Integer, nullable=False)
+    hpev = Column(Integer)
+    attackev = Column(Integer)
+    defenseev = Column(Integer)
+    speedev = Column(Integer)
+    specialev = Column(Integer)
+    attackiv = Column(Integer)
+    defenseiv = Column(Integer)
+    speediv = Column(Integer)
+    specialiv = Column(Integer)
+    exp = Column(Integer)
+    pp1 = Column(Integer)
+    pp2 = Column(Integer)
+    pp3 = Column(Integer)
+    pp4 = Column(Integer)
 
 class Item(Base):
     __tablename__ = 'item'
