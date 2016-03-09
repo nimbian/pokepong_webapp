@@ -1,8 +1,8 @@
 Flask
 Flask-Login
 Flask-WTF
-Flask-SQLalchemy
 Flask-Bcrypt
+SQLalchemy
 pep8
 redis
 gunicorn
