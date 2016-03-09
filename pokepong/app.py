@@ -1,7 +1,7 @@
-from flask import Flask, render_template, redirect, request, jsonify, url_for, abort
+from flask import Flask, render_template, redirect, request, jsonify, url_for, abort, flash
 from flask.ext.login import current_user, login_user, logout_user, LoginManager, login_required
 from time import sleep
-from pokepong.forms import Register, Login, PartySignup, BattleSignup
+from pokepong.forms import Register, Login, PartySignup, BattleSignup, ServerManager
 from pokepong.models import Trainer, Server
 from pokepong.database import db
 from pokepong.red import r
@@ -25,10 +25,9 @@ login_manager.login_view = "login"
 def load_user(trainer_id):
      return Trainer.query.get(trainer_id)
 
-
 @app.route("/")
 def master():
-    return render_template('master.html')
+    return render_template('index.html')
 
 @app.route("/home")
 def homepage():
@@ -45,31 +44,16 @@ def submit(name, pkmn):
     conn.close()
     return redirect("/redirect")
 
-@app.route("/checkUser", methods=['GET'])
-def check_user():
-    team = request.args.get('team')
-    conn = sqlite3.connect('teams.db')
-    c = conn.cursor()
-    sub = "select name from teams where name = '{0}'".format(team)
-    x = c.execute(sub).fetchone()
-    y = x == None
-    return jsonify(res = y)
-
-@app.route("/redirect")
-def redir():
-    return render_template('redirect.html')
-
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = Register()
     if form.validate_on_submit():
         trainer = Trainer.query.filter_by(username=form.username.data).first()
         if trainer:
-            #Should look into flashing username already taken.
+            flash('Username already taken, please select another')
             return render_template('register.html', form=form)
         if form.password1.data != form.password2.data:
-            print 'non-pass match'
-            #Should look into doing some banner flash in flask
+            flash('Your passwords did not match, please try again')
             return render_template('register.html', form=form)
         newuser = Trainer(form.username.data, form.password1.data)
         db.add(newuser)
@@ -82,10 +66,8 @@ def login():
     if form.validate_on_submit():
         trainer = Trainer.query.filter_by(username=form.username.data).first()
         if not trainer:
-            print 'invalid user'
             return render_template('login.html', form=form)
         elif not trainer.check_password(form.password.data):
-            print 'invalid password'
             return render_template('login.html', form=form)
         login_user(trainer)
     return render_template('login.html', form=form)
@@ -120,31 +102,32 @@ def signup():
 def battle():
     mode = Server.query.first().mode
     if mode != 'battle':
-        #popup something about changing the gametype
-        pass
+        flash('game mode is currently set to party,\
+if you want to battle please have an admin change it')
+        return redirect('party')
     form = BattleSignup()
+    form.pokemon.choices = [(pokemon.id, pokemon.name)
+                            for pokemon in current_user.pokemon]
     if form.validate_on_submit():
-        #"pokemon" relationship does not currently exist in the user model,
-        #need to make
-        form.pokemon.choices = [(pokemon.id, pokemon.name)
-                                    for pokemon in current_user.pokemon]
         newteam = {'name' : current_user.uesrname,
-                    'pokemon': form.pokemon.data}
+                   'pokemon': form.pokemon.data}
         r.rpush('lineup', newteam)
         return redirect(url_for('lineup'))
-    return render_template('battle', form=form)
+    return render_template('battle.html', form=form)
 
 @app.route("/admin/manage", methods=['GET', 'POST'])
 @login_required
 def manage_server():
     if not current_user.admin:
-        #404 unauthorized or you are not an admin page or something.
+        #401 unauthorized or you are not an admin page or something.
         abort(401)
-    form = ServerManger()
-    #should add a button to purge player queue
+    form = ServerManager()
+    #TODO:should add a button to purge player queue
+    #TODO:Maybe let admin jump the line ;)
     if form.validate_on_submit():
         Server.query.first().mode = form.mode.data
         db.commit()
+    return render_template('manage.html', form=form)
 
 @app.route("/manage/pokemon", methods=['GET', 'POST'])
 @login_required
