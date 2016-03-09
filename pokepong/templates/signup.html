@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block body %}
+<form action="/signup" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.teamname.label }} {{ form.teamname }}
+    {{ form.player1.label }} {{ form.player1 }}
+    {{ form.player2.label }} {{ form.player2 }}
+    <input type="submit" value="Go">
+</form>
+{% endblock %}
