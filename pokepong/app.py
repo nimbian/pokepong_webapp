@@ -1,11 +1,12 @@
-from flask import Flask, render_template, redirect, request, jsonify, url_for
+from flask import Flask, render_template, redirect, request, jsonify, url_for, abort
 from flask.ext.login import current_user, login_user, logout_user, LoginManager, login_required
 from time import sleep
 from pokepong.forms import Register, Login, PartySignup, BattleSignup
-from pokepong.models import Trainer
+from pokepong.models import Trainer, Server
 from pokepong.database import db
-from pokepong.redis import r
+from pokepong.red import r
 import sqlite3
+import json
 conn = sqlite3.connect('teams.db')
 c = conn.cursor()
 try:
@@ -22,7 +23,7 @@ login_manager.login_view = "login"
 
 @login_manager.user_loader
 def load_user(trainer_id):
-     return Trainer.get(trainer_id)
+     return Trainer.query.get(trainer_id)
 
 
 @app.route("/")
@@ -64,7 +65,6 @@ def register():
     if form.validate_on_submit():
         trainer = Trainer.query.filter_by(username=form.username.data).first()
         if trainer:
-            print trainer
             #Should look into flashing username already taken.
             return render_template('register.html', form=form)
         if form.password1.data != form.password2.data:
@@ -106,8 +106,10 @@ def signup():
         #should put first 150 pokemon in the all pokemon list and just use
         #that for annonimous users.
         newteam = {'name' : form.teamname.data,
+                   'player1': form.player1.data,
+                   'player2': form.player2.data,
                    'pokemon': None}
-        r.rpush('lineup', newteam)
+        r.rpush('lineup', json.dumps(newteam))
         return redirect(url_for('accepted'))
     elif mode == 'battle':
         return redirect(url_for('battle'))
@@ -128,20 +130,33 @@ def battle():
                                     for pokemon in current_user.pokemon]
         newteam = {'name' : current_user.uesrname,
                     'pokemon': form.pokemon.data}
-        r.rpush('linup', newteam)
-        return redirect(url_for('accepted'))
+        r.rpush('lineup', newteam)
+        return redirect(url_for('lineup'))
     return render_template('battle', form=form)
 
 @app.route("/admin/manage", methods=['GET', 'POST'])
 @login_required
-def manage():
+def manage_server():
     if not current_user.admin:
         #404 unauthorized or you are not an admin page or something.
-        pass
-    form = Server()
+        abort(401)
+    form = ServerManger()
+    #should add a button to purge player queue
     if form.validate_on_submit():
-        pass
+        Server.query.first().mode = form.mode.data
+        db.commit()
 
+@app.route("/manage/pokemon", methods=['GET', 'POST'])
+@login_required
+def manage_pokemon():
+    pass
+
+@app.route("/lineup")
+def linup():
+    teams = []
+    for team in r.lrange('lineup', 0, -1):
+        teams.append(json.loads(team))
+    return render_template('lineup.html', teams=teams)
 
 if __name__ == "__main__":
     app.debug = True
