@@ -20,6 +20,6 @@ class BattleSignup(Form):
     #should add a validator to check no more than 6 pokemon are selected
     pokemon = SelectMultipleField(u'pokemon', validators=[DataRequired()])
 
-class ServerManage(Form):
+class ServerManager(Form):
     mode = SelectField(u'Mode', choices=[('battle', 'battle'), ('party', 'party')])
 
