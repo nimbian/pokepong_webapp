@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block body %}
+<table id="linup-table">
+    <caption>Linup</caption>
+    <thead>
+        <tr>
+            <th>Order</th>
+            <th>Teamname</th>
+            <th>Player 1</th>
+            <th>Player 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for team in teams %}
+            <tr>
+                <th> {{ loop.index }} </th>
+                <td> {{ team['name']|e }} </td>
+                <td> {{ team['player1']|e }} </td>
+                <td> {{ team['player2']|e }} </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
