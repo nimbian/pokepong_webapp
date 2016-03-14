@@ -1,21 +1,14 @@
 from flask import Flask, render_template, redirect, request, jsonify, url_for, abort, flash
 from flask.ext.login import current_user, login_user, logout_user, LoginManager, login_required
 from time import sleep
-from pokepong.forms import Register, Login, PartySignup, BattleSignup, ServerManager
-from pokepong.models import Trainer, Server
+from pokepong.forms import Register, Login, PartySignup, BattleSignup
+from pokepong.models import Trainer
 from pokepong.database import db
 from pokepong.red import r
 import sqlite3
 import json
-conn = sqlite3.connect('teams.db')
-c = conn.cursor()
-try:
-    c.execute("""CREATE TABLE teams \
-                    (name text, pkmn1 integer, pkmn2 integer, pkmn3 integer, \
-                    pkmn4 integer, pkmn5 integer, pkmn6 integer)""")
-except:
-    pass
-c.close()
+from random import randrange
+
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -23,28 +16,18 @@ login_manager.login_view = "login"
 
 @login_manager.user_loader
 def load_user(trainer_id):
-     return Trainer.query.get(trainer_id)
+    return Trainer.query.get(trainer_id)
+
+@app.before_first_request
+def init_redis():
+    r.set('mode' 'party')
 
 @app.route("/")
-def master():
+def index():
+    #TODO: make index template
     return render_template('index.html')
 
-@app.route("/home")
-def homepage():
-    return render_template('pkmn.html')
-
-@app.route('/<name>/<pkmn>')
-def submit(name, pkmn):
-    conn = sqlite3.connect('teams.db')
-    c = conn.cursor()
-    sub = "INSERT INTO teams values ('{0}',{1},{2},{3},{4},{5},{6})".format(name, *pkmn.split(','))
-    c.execute(sub)
-    conn.commit()
-    c.close()
-    conn.close()
-    return redirect("/redirect")
-
-@app.route("/register", methods=['GET', 'POST'])
+@app.route("/register", methods=['get', 'post'])
 def register():
     form = Register()
     if form.validate_on_submit():
@@ -60,7 +43,7 @@ def register():
         db.commit()
     return render_template('register.html', form=form)
 
-@app.route("/login", methods=['GET', 'POST'])
+@app.route("/login", methods=['get', 'post'])
 def login():
     form = Login()
     if form.validate_on_submit():
@@ -70,8 +53,9 @@ def login():
         elif not trainer.check_password(form.password.data):
             return render_template('login.html', form=form)
         login_user(trainer)
+        redir = request.args.get('next')
+        return redirect(redir or url_for('index'))
     return render_template('login.html', form=form)
-
 
 @app.route("/logout")
 @login_required
@@ -79,43 +63,49 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route("/signup", methods=['GET', 'POST'])
+@app.route("/signup", methods=['get', 'post'])
 def signup():
-    mode = Server.query.first().mode
+    mode = r.get('mode')
     form = PartySignup()
     #TODO: move enums to Server model.
+    form.pokemon.choices = [(pokemon.id, pokemon.name)
+                            for pokemon in Pokemon.query.order_by('id').limit(151)]
+    base = range(1, 151)
     if mode == 'party' and form.validate_on_submit():
-        #should put first 150 pokemon in the all pokemon list and just use
-        #that for annonimous users.
+        pokemon = form.pokemon.data
+        while len(pokemon) < 6:
+            pokemon.append(randrange(150) + 1)
         newteam = {'name' : form.teamname.data,
                    'player1': form.player1.data,
                    'player2': form.player2.data,
-                   'pokemon': None}
+                   'pokemon': pokemon}
         r.rpush('lineup', json.dumps(newteam))
         return redirect(url_for('accepted'))
     elif mode == 'battle':
         return redirect(url_for('battle'))
-    return render_template('signup.html', form=form)
+    return render_template('signup.html', form=form, base=base)
 
-@app.route("/battle", methods=['GET, POST'])
+@app.route("/battle", methods=['get', 'post'])
 @login_required
 def battle():
-    mode = Server.query.first().mode
+    mode = r.get('mode')
     if mode != 'battle':
         flash('game mode is currently set to party,\
 if you want to battle please have an admin change it')
-        return redirect('party')
+        return redirect(url_for('signup'))
     form = BattleSignup()
     form.pokemon.choices = [(pokemon.id, pokemon.name)
-                            for pokemon in current_user.pokemon]
+                            for pokemon in current_user.pokemon.order_by('id')]
+    base = [p.base_id for p in current_user.pokemon.order_by('id')]
+    print base
     if form.validate_on_submit():
-        newteam = {'name' : current_user.uesrname,
+        newteam = {'name' : current_user.username,
                    'pokemon': form.pokemon.data}
-        r.rpush('lineup', newteam)
+        r.rpush('lineup', json.dumps(newteam))
         return redirect(url_for('lineup'))
-    return render_template('battle.html', form=form)
+    return render_template('battle.html', form=form, base=base)
 
-@app.route("/admin/manage", methods=['GET', 'POST'])
+@app.route("/admin/manage", methods=['get', 'post'])
 @login_required
 def manage_server():
     if not current_user.admin:
@@ -129,13 +119,15 @@ def manage_server():
         db.commit()
     return render_template('manage.html', form=form)
 
-@app.route("/manage/pokemon", methods=['GET', 'POST'])
+@app.route("/manage/pokemon", methods=['get', 'post'])
 @login_required
 def manage_pokemon():
     pass
 
 @app.route("/lineup")
-def linup():
+def lineup():
+    #TODO: make 2 template 1 for party and 1 for battle, battle should show
+    #choosen pokemon instead of players.
     teams = []
     for team in r.lrange('lineup', 0, -1):
         teams.append(json.loads(team))
