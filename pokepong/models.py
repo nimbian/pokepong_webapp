@@ -27,18 +27,27 @@ class Trainer(Base, UserMixin):
         return bcrypt.hashpw(password.encode('utf-8'),
                              self.password.encode('utf-8')) == self.password.encode('utf-8')
 
-
-class Server(Base):
-    __tablename__ = 'server'
-    id = Column(Integer, primary_key=True)
-    mode = Column(String)
-
 class Pokemon(Base):
     __tablename__ = 'pokemon'
     id = Column(Integer, primary_key=True)
-    owner_id = Column(Integer, ForeignKey('trainer.id'))
+    name = Column(String)
+    hp = Column(Integer)
+    attack = Column(Integer)
+    defence = Column(Integer)
+    speed = Column(Integer)
+    special = Column(Integer)
+    exp = Column(Integer)
+    type1 = Column(String)
+    type2 = Column(String)
+
+class Owned(Base):
+    __tablename__ = 'owned'
+    id = Column(Integer, primary_key=True)
+    trainer_id = Column(Integer, ForeignKey('trainer.id'))
     owner = relationship('Trainer',
                          backref=backref('pokemon', lazy='dynamic'))
+    base_id = Column(Integer, ForeignKey('pokemon.id'))
+    base = relationship('Pokemon')
     name = Column(String)
     move1 =Column(String)
     move2 =Column(String)
