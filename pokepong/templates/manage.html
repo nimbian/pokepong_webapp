@@ -1,0 +1,8 @@
+{%extends "layout.html" %}
+{% block body %}
+<form method="post" action="/admin/manage">
+    {{ form.hidden_tag() }}
+    {{ form.mode.label }} {{ form.mode }}
+    <input type="submit" value="Go">
+</form>
+{% endblock %}
