@@ -1,17 +1,27 @@
 <!doctype html>
-<title>Pokepong</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<div class=page>
-  <h1>Pokepong</h1>
-  <div class=metanav>
-  {% if session.user_id %}
-    <a href="{{ url_for('logout') }}">log in</a>
-  {% else %}
-    <a href="{{ url_for('logout') }}">log out</a>
-  {% endif %}
-  </div>
-  {% for message in get_flashed_messages() %}
-    <div class=flash>{{ message }}</div>
-  {% endfor %}
-  {% block body %}{% endblock %}
-</div>
+<html>
+    <head>
+        <title>Pokepong</title>
+        <link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/pkmn.css') }}>
+        <link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/jquery-ui.min.css') }}>
+        <link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/stylesheet.css') }}>
+        <link rel="shortcut icon" href= {{ url_for('static', filename = 'images/favicon.ico') }}>
+        <script src= {{ url_for('static', filename = 'js/pkmn.js') }}></script>
+        <script src= {{ url_for('static', filename = 'js/jquery-2.2.0.min.js') }}></script>
+        <script src= {{ url_for('static', filename = 'js/jquery-ui.min.js') }}></script>
+    </head>
+    <div class=page>
+    <h1>Pokepong</h1>
+    <div class=metanav>
+    {% if session.user_id %}
+        <a href="{{ url_for('login') }}">log in</a>
+    {% else %}
+        <a href="{{ url_for('logout') }}">log out</a>
+    {% endif %}
+    </div>
+    {% for message in get_flashed_messages() %}
+        <div class=flash>{{ message }}</div>
+    {% endfor %}
+    {% block body %}{% endblock %}
+    </div>
+</html>
