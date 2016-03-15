@@ -20,7 +20,7 @@ def load_user(trainer_id):
 
 @app.before_first_request
 def init_redis():
-    r.set('mode' 'party')
+    r.set('mode', 'party', nx=True)
 
 @app.route("/")
 def index():
