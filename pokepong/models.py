@@ -19,6 +19,7 @@ class LearnableHm(Base):
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
     pokemon = relationship('Pokemon', backref=backref('learnablehms'))
     tmhm_id = Column(Integer, ForeignKey('tmhm.id'), nullable=False)
+    hm = relationship('TmHm')
 
 class LearnableTm(Base):
     __tablename__ = 'learnabletm'
@@ -26,7 +27,7 @@ class LearnableTm(Base):
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
     pokemon = relationship('Pokemon', backref=backref('learnabletms'))
     tmhm_id = Column(Integer, ForeignKey('tmhm.id'), nullable=False)
-
+    tm = relationship('TmHm')
 
 class TmHm(Base):
     __tablename__ = 'tmhm'
@@ -119,6 +120,7 @@ class Pokemon(Base):
     type2 = Column(String)
     lvlspeed = Column(String, nullable=False)
 
+
 class Owned(Base):
     __tablename__ = 'owned'
     id = Column(Integer, primary_key=True)
@@ -127,10 +129,10 @@ class Owned(Base):
     base_id = Column(Integer, ForeignKey('pokemon.id'))
     base = relationship('Pokemon')
     name = Column(String)
-    move1 =Column(String)
-    move2 =Column(String)
-    move3 =Column(String)
-    move4 =Column(String)
+    move1 = Column(String)
+    move2 = Column(String)
+    move3 = Column(String)
+    move4 = Column(String)
     lvl = Column(Integer, nullable=False)
     hpev = Column(Integer)
     attackev = Column(Integer)
