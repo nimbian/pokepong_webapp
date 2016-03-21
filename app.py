@@ -1,3 +1,4 @@
+from __future__ import absolute_import, print_function
 from pokepong.app import app
 from pokepong.config import _cfg, _cfgi
 
