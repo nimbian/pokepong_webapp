@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block body %}
+<table id="linup-table">
+    <caption>Linup</caption>
+    <thead>
+        <tr>
+            <th>Order</th>
+            <th>Trainer</th>
+            <th>Pokemon</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for team in teams %}
+            <tr>
+                <th> {{ loop.index }} </th>
+                <td> {{ team['name']|e }} </td>
+                <td>
+                {% for pokemon in team['pokemon'] %}
+                    <i style="float: left; margin-left: 50px; margin-top: 50px" class="sprite sprite-{{ pokemon }}"></i>
+                {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
