@@ -1,13 +1,12 @@
 from flask import Flask, render_template, redirect, request, jsonify, url_for, abort, flash
 from flask.ext.login import current_user, login_user, logout_user, LoginManager, login_required
-from time import sleep
-from pokepong.forms import Register, Login, PartySignup, BattleSignup
-from pokepong.models import Trainer
-from pokepong.database import db
-from pokepong.red import r
-import sqlite3
 import json
 from random import randrange
+from pokepong.forms import Register, Login, PartySignup, BattleSignup, ServerManager
+from pokepong.config import _cfg, _cfgi
+from pokepong.models import Trainer, Pokemon
+from pokepong.database import db
+from pokepong.red import r
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -24,7 +23,6 @@ def init_redis():
 
 @app.route("/")
 def index():
-    #TODO: make index template
     return render_template('index.html')
 
 @app.route("/register", methods=['get', 'post'])
@@ -49,8 +47,10 @@ def login():
     if form.validate_on_submit():
         trainer = Trainer.query.filter_by(username=form.username.data).first()
         if not trainer:
+            flash('Username not found or passwoord is incorrect')
             return render_template('login.html', form=form)
         elif not trainer.check_password(form.password.data):
+            flash('Username not found or passwoord is incorrect')
             return render_template('login.html', form=form)
         login_user(trainer)
         redir = request.args.get('next')
@@ -67,7 +67,6 @@ def logout():
 def signup():
     mode = r.get('mode')
     form = PartySignup()
-    #TODO: move enums to Server model.
     form.pokemon.choices = [(pokemon.id, pokemon.name)
                             for pokemon in Pokemon.query.order_by('id').limit(151)]
     base = range(1, 151)
@@ -83,7 +82,7 @@ def signup():
         return redirect(url_for('accepted'))
     elif mode == 'battle':
         return redirect(url_for('battle'))
-    return render_template('signup.html', form=form, base=base)
+    return render_template('party_signup.html', form=form, base=base)
 
 @app.route("/battle", methods=['get', 'post'])
 @login_required
@@ -97,42 +96,50 @@ if you want to battle please have an admin change it')
     form.pokemon.choices = [(pokemon.id, pokemon.name)
                             for pokemon in current_user.pokemon.order_by('id')]
     base = [p.base_id for p in current_user.pokemon.order_by('id')]
-    print base
     if form.validate_on_submit():
-        newteam = {'name' : current_user.username,
+        newteam = {'name' : current_user.name,
                    'pokemon': form.pokemon.data}
         r.rpush('lineup', json.dumps(newteam))
         return redirect(url_for('lineup'))
-    return render_template('battle.html', form=form, base=base)
+    return render_template('battle_signup.html', form=form, base=base)
 
-@app.route("/admin/manage", methods=['get', 'post'])
+@app.route("/admin", methods=['get', 'post'])
 @login_required
 def manage_server():
     if not current_user.admin:
         #401 unauthorized or you are not an admin page or something.
         abort(401)
     form = ServerManager()
-    #TODO:should add a button to purge player queue
     #TODO:Maybe let admin jump the line ;)
     if form.validate_on_submit():
-        Server.query.first().mode = form.mode.data
-        db.commit()
+        r.set('mode', form.mode.data)
+        if form.purge.data:
+            r.delete('lineup')
     return render_template('manage.html', form=form)
 
-@app.route("/manage/pokemon", methods=['get', 'post'])
+@app.route("/pokemon", methods=['get', 'post'])
 @login_required
-def manage_pokemon():
-    pass
+def view_pokemon():
+    return render_template('pokemon.html', pokemon=current_user.pokemon)
 
 @app.route("/lineup")
 def lineup():
-    #TODO: make 2 template 1 for party and 1 for battle, battle should show
-    #choosen pokemon instead of players.
     teams = []
-    for team in r.lrange('lineup', 0, -1):
-        teams.append(json.loads(team))
-    return render_template('lineup.html', teams=teams)
+    mode = r.get('mode')
+    if mode == 'party':
+        for team in r.lrange('lineup', 0, -1):
+            teams.append(json.loads(team))
+        return render_template('party_lineup.html', teams=teams)
+    elif mode == 'battle':
+        for team in r.lrange('lineup', 0, -1):
+            load = dict(json.loads(team))
+            load['pokemon'] = [pokemon.base_id for pokemon in
+                              Trainer.query.filter(Trainer.name==load['name']).one().pokemon]
+            teams.append(load)
+        return render_template('battle_lineup.html', teams=teams)
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run(host='pokepong', port=80)
+    app.secret_key = _cfg("secret-key")
+    app.run(host=_cfg("debug-host"),
+            port=_cfgi('debug-port'),
+            debug=True)
