@@ -4,9 +4,9 @@
     {{ form.hidden_tag() }}
     <ul>
     {% for pokemon in form.pokemon %}
-    <li style="float: left; margin-left: 50px">{{ pokemon }}
-        <i style="margin-top: 35px" class="sprite sprite-{{ base[loop.index0] }}"></i>
-    </li>
+        <li style="float: left; margin-left: 50px">{{ pokemon }}
+            <i style="margin-top: 35px" class="sprite sprite-{{ base[loop.index0] }}"></i>
+        </li>
     {% endfor %}
     </ul>
     <input type="submit" value="Go">
