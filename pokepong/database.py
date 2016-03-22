@@ -12,3 +12,7 @@ Base.query = db.query_property()
 def init_db():
     import pokepong.models
     Base.metadata.create_all(bind=engine)
+    with engine.begin() as conn:
+        with open('pokepong/pokemon.sql', 'r') as file_:
+            for line in file_:
+                conn.execute(line)

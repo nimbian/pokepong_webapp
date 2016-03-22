@@ -5,6 +5,14 @@
     {{ form.teamname.label }} {{ form.teamname }}
     {{ form.player1.label }} {{ form.player1 }}
     {{ form.player2.label }} {{ form.player2 }}
+    <ul>
+    {% for pokemon in form.pokemon %}
+        <li style="float: left; margin-left: 50px; margin-top: 35px">{{ pokemon }}
+            <i style="margin-top: 35px" class="sprite sprite-{{ base[loop.index0] }}"></i>
+        </li>
+    {% endfor %}
+    </ul>
+
     <input type="submit" value="Go">
 </form>
 {% endblock %}

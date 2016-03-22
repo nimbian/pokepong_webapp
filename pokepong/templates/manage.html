@@ -1,0 +1,9 @@
+{%extends "layout.html" %}
+{% block body %}
+<form method="post" action="/admin">
+    {{ form.hidden_tag() }}
+    {{ form.mode.label }} {{ form.mode }}
+    {{ form.purge.label }} {{ form.purge }}
+    <input type="submit" value="Go">
+</form>
+{% endblock %}
