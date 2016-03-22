@@ -17,7 +17,7 @@ class LearnableHm(Base):
     __tablename__ = 'learnablehm'
     id = Column(Integer, primary_key=True)
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
-    pokemon = relationship('Pokemon', backref=backref('learnablehms'))
+    pokemon = relationship('Pokemon', backref='learnablehms')
     tmhm_id = Column(Integer, ForeignKey('tmhm.id'), nullable=False)
     hm = relationship('TmHm')
 
@@ -25,7 +25,7 @@ class LearnableTm(Base):
     __tablename__ = 'learnabletm'
     id = Column(Integer, primary_key=True)
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
-    pokemon = relationship('Pokemon', backref=backref('learnabletms'))
+    pokemon = relationship('Pokemon', backref='learnabletms')
     tmhm_id = Column(Integer, ForeignKey('tmhm.id'), nullable=False)
     tm = relationship('TmHm')
 
@@ -34,7 +34,7 @@ class TmHm(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     move_id = Column(Integer, ForeignKey('move.id'), nullable=False)
-    move = relationship('Move', backref=backref('TmHm'), uselist=False)
+    move = relationship('Move', backref=backref('TmHm', uselist=False))
     
 class Type(Base):
     __tablename__ = 'type'
@@ -60,7 +60,7 @@ class Pokedex(Base):
     __tablename__ = 'pokedex'
     id = Column(Integer, primary_key=True)
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
-    pokemon = relationship('Pokemon', backref=backref('pokedex'), uselist=False)
+    pokemon = relationship('Pokemon', backref=backref('pokedex', uselist=False))
     height = Column(String, nullable=False)
     weight = Column(String, nullable=False)
     entry = Column(String, nullable=False)
@@ -69,7 +69,7 @@ class LearnableMove(Base):
     __tablename__ = 'learnablemove'
     id = Column(Integer, primary_key=True)
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
-    pokemon = relationship('Pokemon', backref=backref('learns'))
+    pokemon = relationship('Pokemon', backref='learns')
     move_id = Column(Integer, ForeignKey('move.id'),  nullable=False)
     move = relationship('Move')
     learnedat = Column(Integer, nullable=False)
@@ -79,7 +79,7 @@ class Move(Base):
     id = Column(Integer, primary_key=True)
     move = Column(String, nullable=False)
     type_id = Column(String, ForeignKey('type.id'), nullable=False)
-    type_ = relationship('Type', backref=backref('moves'))
+    type_ = relationship('Type', backref='moves')
     pp = Column(Integer, nullable=False)
     power = Column(Integer)
     acc = Column(Integer)
@@ -119,13 +119,17 @@ class Pokemon(Base):
     type1 = Column(String)
     type2 = Column(String)
     lvlspeed = Column(String, nullable=False)
-
+    evolves_to_id = Column(Integer, ForeignKey('pokemon.id'))
+    evolves_at = Column(Integer)
+    evolves_to = relationship('Pokemon',
+                              lazy='joined',
+                              join_depth=1)
 
 class Owned(Base):
     __tablename__ = 'owned'
     id = Column(Integer, primary_key=True)
     trainer_id = Column(Integer, ForeignKey('trainer.id'))
-    owner = relationship('Trainer', backref=backref('pokemon'))
+    owner = relationship('Trainer', backref='pokemon')
     base_id = Column(Integer, ForeignKey('pokemon.id'))
     base = relationship('Pokemon')
     name = Column(String)
