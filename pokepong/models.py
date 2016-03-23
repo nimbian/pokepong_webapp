@@ -143,24 +143,32 @@ class Owned(Base):
     move4_id = Column(Integer, ForeignKey('move.id'))
     move4 = relationship('Move', foreign_keys='Owned.move4_id')
     lvl = Column(Integer, nullable=False)
-    hpev = Column(Integer)
-    attackev = Column(Integer)
-    defenseev = Column(Integer)
-    speedev = Column(Integer)
-    specialev = Column(Integer)
-    attackiv = Column(Integer)
-    defenseiv = Column(Integer)
-    speediv = Column(Integer)
-    specialiv = Column(Integer)
-    exp = Column(Integer)
-    pp1 = Column(Integer)
-    pp2 = Column(Integer)
-    pp3 = Column(Integer)
-    pp4 = Column(Integer)
+    hpev = Column(Integer, default=0)
+    attackev = Column(Integer, default=0)
+    defenseev = Column(Integer, default=0)
+    speedev = Column(Integer, default=0)
+    specialev = Column(Integer, default=0)
+    attackiv = Column(Integer, default=random.randint(0,15))
+    defenseiv = Column(Integer, default=random.randint(0,15))
+    speediv = Column(Integer, default=random.randint(0,15))
+    specialiv = Column(Integer, default=random.randint(0,15))
+    exp = Column(Integer, default=0)
+    pp1 = Column(Integer, default=0)
+    pp2 = Column(Integer, default=0)
+    pp3 = Column(Integer, default=0)
+    pp4 = Column(Integer, default=0)
+
+    def __init__(self, base_id, lvl=5):
+        self.base_id = base_id
+        self.lvl = lvl
+        x = LearnableMove.query.filter(LearnableMove.learnedat < self.lvl)
+                               .filter(LearnableMove.pokemon_id == self.base_id).all()
+        move1,move2,move3,move4 = (x[-4:]+([None] * 4))[:4]
 
     @property
     def maxhp(self):
-        I = [0, 8][self.attackiv % 2] + [0, 4][self.defenseiv % 2] + [0, 2][self.speediv % 2] + [0, 1][self.specialiv % 2]
+        I = [0, 8][self.attackiv % 2] + [0, 4][self.defenseiv % 2] +
+            [0, 2][self.speediv % 2] + [0, 1][self.specialiv % 2]
         E = min(63, int(floor(floor((max(0, self.hpev-1)**.5)+1)/4.)))
         stat = floor((2 * self.base.hp + I + E) * self.lvl / 100. + 5)
         return stat
