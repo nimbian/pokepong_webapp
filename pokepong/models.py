@@ -160,10 +160,20 @@ class Owned(Base):
         stat = floor((2 * self.base.hp + I + E) * self.lvl / 100. + 5)
         return stat
 
-class Item(Base):
-    __tablename__ = 'item'
+class OwnedItem(Base):
+    __tablename__ = 'owneditem'
     #likely just link item id in complete item db to trainer(2 relationships)
     id = Column(Integer, primary_key=True)
+    item_id = Column(Integer, ForeignKey('items.id'))
     trainer_id = Column(Integer, ForeignKey('trainer.id'))
-    owner = relationship('Trainer', backref='item')
+    owner = relationship('Trainer', backref='items')
     count = Column(Integer)
+
+class Items(Base):
+    __tablename__ = 'items'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    battle = Column(Integer)
+    buyable = Column(Integer)
+    buyprice = Column(Integer)
+    sellprice = Column(Integer)
