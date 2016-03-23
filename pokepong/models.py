@@ -35,7 +35,7 @@ class TmHm(Base):
     name = Column(String, nullable=False)
     move_id = Column(Integer, ForeignKey('move.id'), nullable=False)
     move = relationship('Move', backref=backref('TmHm', uselist=False))
-    
+
 class Type(Base):
     __tablename__ = 'type'
     id = Column(Integer, primary_key=True)
@@ -77,10 +77,10 @@ class LearnableMove(Base):
 class Move(Base):
     __tablename__ = 'move'
     id = Column(Integer, primary_key=True)
-    move = Column(String, nullable=False)
+    name = Column(String, nullable=False)
     type_id = Column(String, ForeignKey('type.id'), nullable=False)
     type_ = relationship('Type', backref='moves')
-    pp = Column(Integer, nullable=False)
+    maxpp = Column(Integer, nullable=False)
     power = Column(Integer)
     acc = Column(Integer)
 
@@ -133,10 +133,10 @@ class Owned(Base):
     base_id = Column(Integer, ForeignKey('pokemon.id'))
     base = relationship('Pokemon')
     name = Column(String)
-    move1 = Column(String)
-    move2 = Column(String)
-    move3 = Column(String)
-    move4 = Column(String)
+    move1 = Column(Integer, ForeignKey('move.id')
+    move2 = Column(Integer, ForeignKey('move.id')
+    move3 = Column(Integer, ForeignKey('move.id')
+    move4 = Column(Integer, ForeignKey('move.id')
     lvl = Column(Integer, nullable=False)
     hpev = Column(Integer)
     attackev = Column(Integer)
@@ -153,7 +153,17 @@ class Owned(Base):
     pp3 = Column(Integer)
     pp4 = Column(Integer)
 
+    @property
+    def maxhp():
+        I = [0,8][self.attackiv % 2] + [0,4][self.defenseiv % 2] + [0,2][self.speediv % 2] + [0,1][self.specialiv % 2]
+        E = min(63,int(floor(floor((max(0, self.hpev-1)**.5)+1)/4.)))
+        stat = floor((2 * self.base.hp + I + E) * self.lvl / 100. + 5)
+        return stat
+
 class Item(Base):
     __tablename__ = 'item'
     #likely just link item id in complete item db to trainer(2 relationships)
     id = Column(Integer, primary_key=True)
+    trainer_id = Column(Integer, ForeignKey('trainer.id'))
+    owner = relationship('Trainer', backref='item')
+    count = Column(Integer)
