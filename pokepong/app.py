@@ -21,6 +21,10 @@ def load_user(trainer_id):
 def init_redis():
     r.set('mode', 'party', nx=True)
 
+@app.teardown_appcontext
+def shutdown_session(dummy_exception=None):
+    db.remove()
+
 @app.route("/")
 def index():
     return render_template('index.html')
