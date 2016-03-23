@@ -167,7 +167,6 @@ class Owned(Base):
 
 class OwnedItem(Base):
     __tablename__ = 'owneditem'
-    #likely just link item id in complete item db to trainer(2 relationships)
     id = Column(Integer, primary_key=True)
     item_id = Column(Integer, ForeignKey('items.id'))
     trainer_id = Column(Integer, ForeignKey('trainer.id'))
