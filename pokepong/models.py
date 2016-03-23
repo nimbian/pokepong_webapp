@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function
+from math import floor
 from sqlalchemy import (Column,
                         Integer,
                         String,
@@ -133,10 +134,14 @@ class Owned(Base):
     base_id = Column(Integer, ForeignKey('pokemon.id'))
     base = relationship('Pokemon')
     name = Column(String)
-    move1 = Column(Integer, ForeignKey('move.id')
-    move2 = Column(Integer, ForeignKey('move.id')
-    move3 = Column(Integer, ForeignKey('move.id')
-    move4 = Column(Integer, ForeignKey('move.id')
+    move1_id = Column(Integer, ForeignKey('move.id'))
+    move1 = relationship('Move', foreign_keys='Owned.move1_id')
+    move2_id = Column(Integer, ForeignKey('move.id'))
+    move2 = relationship('Move', foreign_keys='Owned.move2_id')
+    move3_id = Column(Integer, ForeignKey('move.id'))
+    move3 = relationship('Move', foreign_keys='Owned.move3_id')
+    move4_id = Column(Integer, ForeignKey('move.id'))
+    move4 = relationship('Move', foreign_keys='Owned.move4_id')
     lvl = Column(Integer, nullable=False)
     hpev = Column(Integer)
     attackev = Column(Integer)
@@ -154,9 +159,9 @@ class Owned(Base):
     pp4 = Column(Integer)
 
     @property
-    def maxhp():
-        I = [0,8][self.attackiv % 2] + [0,4][self.defenseiv % 2] + [0,2][self.speediv % 2] + [0,1][self.specialiv % 2]
-        E = min(63,int(floor(floor((max(0, self.hpev-1)**.5)+1)/4.)))
+    def maxhp(self):
+        I = [0, 8][self.attackiv % 2] + [0, 4][self.defenseiv % 2] + [0, 2][self.speediv % 2] + [0, 1][self.specialiv % 2]
+        E = min(63, int(floor(floor((max(0, self.hpev-1)**.5)+1)/4.)))
         stat = floor((2 * self.base.hp + I + E) * self.lvl / 100. + 5)
         return stat
 
@@ -165,5 +170,5 @@ class Item(Base):
     #likely just link item id in complete item db to trainer(2 relationships)
     id = Column(Integer, primary_key=True)
     trainer_id = Column(Integer, ForeignKey('trainer.id'))
-    owner = relationship('Trainer', backref='item')
+    owner = relationship('Trainer', backref='items')
     count = Column(Integer)
