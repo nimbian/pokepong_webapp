@@ -33,7 +33,7 @@ def index():
 def register():
     form = Register()
     if form.validate_on_submit():
-        trainer = Trainer.query.filter_by(username=form.username.data).first()
+        trainer = Trainer.query.filter_by(name=form.username.data).first()
         if trainer:
             flash('Username already taken, please select another')
             return render_template('register.html', form=form)
@@ -49,7 +49,7 @@ def register():
 def login():
     form = Login()
     if form.validate_on_submit():
-        trainer = Trainer.query.filter_by(username=form.username.data).first()
+        trainer = Trainer.query.filter_by(name=form.username.data).first()
         if not trainer:
             flash('Username not found or passwoord is incorrect')
             return render_template('login.html', form=form)
