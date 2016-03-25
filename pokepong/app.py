@@ -109,7 +109,7 @@ if you want to battle please have an admin change it')
 
 @app.route("/admin", methods=['get', 'post'])
 @login_required
-def manage_server():
+def admin():
     if not current_user.admin:
         #401 unauthorized or you are not an admin page or something.
         abort(401)
