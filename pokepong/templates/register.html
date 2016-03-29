@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<form method="POST" action="/register">
+<form method="POST" action="{{ url_for('register') }}">
     {{ form.hidden_tag() }}
     {{ form.username.label }} {{ form.username }}
     {{ form.password1.label }} {{ form.password1 }}
