@@ -1,6 +1,7 @@
 from __future__ import absolute_import, print_function
 from math import floor
 import random
+from datetime import datetime
 from sqlalchemy import (Column,
                         Integer,
                         String,
@@ -12,7 +13,6 @@ from sqlalchemy import (Column,
 from sqlalchemy.orm import relationship, backref
 from flask.ext.login import UserMixin
 from pokepong.database import Base
-from datetime import datetime
 import bcrypt
 
 class LearnableHm(Base):
@@ -144,7 +144,8 @@ class Owned(Base):
     __tablename__ = 'owned'
     id = Column(Integer, primary_key=True)
     trainer_id = Column(Integer, ForeignKey('trainer.id'))
-    owner = relationship('Trainer', backref='pokemon')
+    owner = relationship('Trainer', backref=backref('pokemon',
+                                                    order_by='Owned.id'))
     base_id = Column(Integer, ForeignKey('pokemon.id'))
     base = relationship('Pokemon')
     name = Column(String)
