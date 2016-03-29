@@ -92,6 +92,7 @@ class Trainer(Base, UserMixin):
     password = Column(String)
     admin = Column(Boolean)
     created = Column(DateTime)
+    money = Column(Integer, default=1500)
 
     def __init__(self, name, password, admin=False):
         self.name = name
@@ -113,7 +114,7 @@ class Pokemon(Base):
     name = Column(String)
     hp = Column(Integer)
     attack = Column(Integer)
-    defence = Column(Integer)
+    defense = Column(Integer)
     speed = Column(Integer)
     special = Column(Integer)
     exp = Column(Integer)
