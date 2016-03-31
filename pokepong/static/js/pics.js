@@ -14,4 +14,3 @@ for (i = 1; i <= 150; i++){
 	document.getElementById("pkmns").appendChild(newinput);
 	document.getElementById("pkmns").appendChild(newlabel);
 }
-checkboxlimit(document.forms.pkmns.pkmn,6);

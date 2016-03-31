@@ -1,5 +1,7 @@
 from __future__ import absolute_import, print_function
 from math import floor
+import random
+from datetime import datetime
 from sqlalchemy import (Column,
                         Integer,
                         String,
@@ -11,10 +13,10 @@ from sqlalchemy import (Column,
 from sqlalchemy.orm import relationship, backref
 from flask.ext.login import UserMixin
 from pokepong.database import Base
-from datetime import datetime
 import bcrypt
 
 class LearnableHm(Base):
+    '''Simple Class to map all the learnable hms and the pokemon that can learn them'''
     __tablename__ = 'learnablehm'
     id = Column(Integer, primary_key=True)
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
@@ -23,6 +25,7 @@ class LearnableHm(Base):
     hm = relationship('TmHm')
 
 class LearnableTm(Base):
+    '''Simple Class to map all the learnable tms and the pokemon that can learn them'''
     __tablename__ = 'learnabletm'
     id = Column(Integer, primary_key=True)
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
@@ -31,6 +34,7 @@ class LearnableTm(Base):
     tm = relationship('TmHm')
 
 class TmHm(Base):
+    '''Simple Class to map all the learnable tm/hms and thier move'''
     __tablename__ = 'tmhm'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
@@ -38,6 +42,7 @@ class TmHm(Base):
     move = relationship('Move', backref=backref('TmHm', uselist=False))
 
 class Type(Base):
+    '''Lookup class the defines all the pokemon and move types'''
     __tablename__ = 'type'
     id = Column(Integer, primary_key=True)
     type_ = Column(String, nullable=False)
@@ -58,6 +63,7 @@ class Type(Base):
     water = Column(Float, nullable=False)
 
 class Pokedex(Base):
+    '''Lookup class that defines all of the pokedex entries'''
     __tablename__ = 'pokedex'
     id = Column(Integer, primary_key=True)
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
@@ -67,15 +73,17 @@ class Pokedex(Base):
     entry = Column(String, nullable=False)
 
 class LearnableMove(Base):
+    '''Lookup class that maps the a pokemon to a move and the level they learn it at'''
     __tablename__ = 'learnablemove'
     id = Column(Integer, primary_key=True)
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'), nullable=False)
     pokemon = relationship('Pokemon', backref='learns')
-    move_id = Column(Integer, ForeignKey('move.id'),  nullable=False)
+    move_id = Column(Integer, ForeignKey('move.id'), nullable=False)
     move = relationship('Move')
     learnedat = Column(Integer, nullable=False)
 
 class Move(Base):
+    '''Class defining every possible move and its stats'''
     __tablename__ = 'move'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
@@ -86,6 +94,7 @@ class Move(Base):
     acc = Column(Integer)
 
 class Trainer(Base, UserMixin):
+    '''Every registered trainer'''
     __tablename__ = 'trainer'
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
@@ -100,15 +109,19 @@ class Trainer(Base, UserMixin):
         self.admin = admin
         self.created = datetime.now()
 
+    #TODO: Maybe use sqlalchemy hybrid atribute? Seems like overkill tho.....
     def set_password(self, password):
+        '''Uses bcrypt to hash the password before setting it to the pasword field'''
         self.password = bcrypt.hashpw(password.encode('utf-8'),
                                       bcrypt.gensalt()).decode('utf-8')
 
     def check_password(self, password):
+        '''Uses bcrypt to compare password to given string'''
         return bcrypt.hashpw(password.encode('utf-8'),
                              self.password.encode('utf-8')) == self.password.encode('utf-8')
 
 class Pokemon(Base):
+    '''Lookup class that has the base stats of all the pokemon types'''
     __tablename__ = 'pokemon'
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -129,10 +142,12 @@ class Pokemon(Base):
     basecatch = Column(Integer)
 
 class Owned(Base):
+    '''Class that holds a captured pokemon mapped to the owning trainer'''
     __tablename__ = 'owned'
     id = Column(Integer, primary_key=True)
     trainer_id = Column(Integer, ForeignKey('trainer.id'))
-    owner = relationship('Trainer', backref='pokemon')
+    owner = relationship('Trainer', backref=backref('pokemon',
+                                                    order_by='Owned.id'))
     base_id = Column(Integer, ForeignKey('pokemon.id'))
     base = relationship('Pokemon')
     name = Column(String)
@@ -150,10 +165,10 @@ class Owned(Base):
     defenseev = Column(Integer, default=0)
     speedev = Column(Integer, default=0)
     specialev = Column(Integer, default=0)
-    attackiv = Column(Integer, default=random.randint(0,15))
-    defenseiv = Column(Integer, default=random.randint(0,15))
-    speediv = Column(Integer, default=random.randint(0,15))
-    specialiv = Column(Integer, default=random.randint(0,15))
+    attackiv = Column(Integer, default=random.randint(0, 15))
+    defenseiv = Column(Integer, default=random.randint(0, 15))
+    speediv = Column(Integer, default=random.randint(0, 15))
+    specialiv = Column(Integer, default=random.randint(0, 15))
     exp = Column(Integer, default=0)
     pp1 = Column(Integer, default=0)
     pp2 = Column(Integer, default=0)
@@ -163,13 +178,14 @@ class Owned(Base):
     def __init__(self, base_id, lvl=5):
         self.base_id = base_id
         self.lvl = lvl
-        x = LearnableMove.query.filter(LearnableMove.learnedat < self.lvl)
-                               .filter(LearnableMove.pokemon_id == self.base_id).all()
-        move1,move2,move3,move4 = (x[-4:]+([None] * 4))[:4]
+        x = LearnableMove.query.filter(
+            LearnableMove.learnedat < self.lvl) .filter(
+                LearnableMove.pokemon_id == self.base_id).all()
+        self.move1, self.move2, self.move3, self.move4 = (x[-4:]+([None] * 4))[:4]
 
     @property
     def maxhp(self):
-        I = [0, 8][self.attackiv % 2] + [0, 4][self.defenseiv % 2] +
+        I = [0, 8][self.attackiv % 2] + [0, 4][self.defenseiv % 2] +\
             [0, 2][self.speediv % 2] + [0, 1][self.specialiv % 2]
         E = min(63, int(floor(floor((max(0, self.hpev-1)**.5)+1)/4.)))
         stat = floor((2 * self.base.hp + I + E) * self.lvl / 100. + 5)

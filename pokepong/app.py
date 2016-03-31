@@ -15,21 +15,30 @@ login_manager.login_view = "login"
 
 @login_manager.user_loader
 def load_user(trainer_id):
+    '''Rehadrate the the user-session bassed on the id from cookie'''
     return Trainer.query.get(trainer_id)
 
 @app.before_first_request
 def init_redis():
+    '''Set the mode to party when the app starts if not already set'''
     r.set('mode', 'party', nx=True)
+
+@app.teardown_appcontext
+def shutdown_session(dummy_exception=None):
+    '''Teardown the db session after every request to reset it'''
+    db.remove()
 
 @app.route("/")
 def index():
+    '''simple index landing page'''
     return render_template('index.html')
 
 @app.route("/register", methods=['get', 'post'])
 def register():
+    '''Regester the user'''
     form = Register()
     if form.validate_on_submit():
-        trainer = Trainer.query.filter_by(username=form.username.data).first()
+        trainer = Trainer.query.filter_by(name=form.username.data).first()
         if trainer:
             flash('Username already taken, please select another')
             return render_template('register.html', form=form)
@@ -43,9 +52,10 @@ def register():
 
 @app.route("/login", methods=['get', 'post'])
 def login():
+    '''Login the user'''
     form = Login()
     if form.validate_on_submit():
-        trainer = Trainer.query.filter_by(username=form.username.data).first()
+        trainer = Trainer.query.filter_by(name=form.username.data).first()
         if not trainer:
             flash('Username not found or passwoord is incorrect')
             return render_template('login.html', form=form)
@@ -53,6 +63,7 @@ def login():
             flash('Username not found or passwoord is incorrect')
             return render_template('login.html', form=form)
         login_user(trainer)
+        flash('You were logged in')
         redir = request.args.get('next')
         return redirect(redir or url_for('index'))
     return render_template('login.html', form=form)
@@ -60,11 +71,13 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
+    '''log user out and teardown the cookies'''
     logout_user()
     return redirect(url_for('login'))
 
 @app.route("/signup", methods=['get', 'post'])
 def signup():
+    '''signup for a new party battle or redirect user if in battle mode'''
     mode = r.get('mode')
     form = PartySignup()
     form.pokemon.choices = [(pokemon.id, pokemon.name)
@@ -87,6 +100,7 @@ def signup():
 @app.route("/battle", methods=['get', 'post'])
 @login_required
 def battle():
+    '''register for a new battle or warn user if set to party'''
     mode = r.get('mode')
     if mode != 'battle':
         flash('game mode is currently set to party,\
@@ -94,8 +108,8 @@ if you want to battle please have an admin change it')
         return redirect(url_for('signup'))
     form = BattleSignup()
     form.pokemon.choices = [(pokemon.id, pokemon.name)
-                            for pokemon in current_user.pokemon.order_by('id')]
-    base = [p.base_id for p in current_user.pokemon.order_by('id')]
+                            for pokemon in current_user.pokemon]
+    base = [p.base_id for p in current_user.pokemon]
     if form.validate_on_submit():
         newteam = {'name' : current_user.name,
                    'pokemon': form.pokemon.data}
@@ -105,9 +119,9 @@ if you want to battle please have an admin change it')
 
 @app.route("/admin", methods=['get', 'post'])
 @login_required
-def manage_server():
+def admin():
+    '''simple admin page'''
     if not current_user.admin:
-        #401 unauthorized or you are not an admin page or something.
         abort(401)
     form = ServerManager()
     #TODO:Maybe let admin jump the line ;)
