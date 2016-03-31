@@ -126,6 +126,7 @@ class Pokemon(Base):
     evolves_to = relationship('Pokemon',
                               lazy='joined',
                               join_depth=1)
+    basecatch = Column(Integer)
 
 class Owned(Base):
     __tablename__ = 'owned'
