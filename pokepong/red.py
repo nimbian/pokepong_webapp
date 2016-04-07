@@ -1,4 +1,4 @@
+from flask import current_app
 import redis
-from pokepong.config import _cfg
 
-r = redis.StrictRedis.from_url(_cfg('redis-connection'))
+r = redis.StrictRedis.from_url(current_app.config['REDIS_CONNECTION'])
