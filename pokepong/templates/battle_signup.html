@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<form method="POST" action="{{ url_for('battle') }}">
+<form method="post" action="{{ url_for('pokepong.battle') }}">
     {{ form.hidden_tag() }}
     <ul>
     {% for pokemon in form.pokemon %}
