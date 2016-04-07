@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, SelectField, SelectMultipleField, widgets, BooleanField
+from wtforms import StringField, PasswordField, SelectField, SelectMultipleField, widgets, BooleanField, RadioField
 from wtforms.validators import DataRequired, ValidationError
 
 
@@ -11,6 +11,10 @@ class Register(Form):
     username = StringField(u'username', validators=[DataRequired()])
     password1 = PasswordField(u'password1', validators=[DataRequired()])
     password2 = PasswordField(u'password2', validators=[DataRequired()])
+    pokemon = RadioField(u'pokemon',
+                         choices=[(1, 1), (4, 4), (7, 7)],
+                         validators=[DataRequired()],
+                         coerce=int)
 
 class Login(Form):
     username = StringField(u'username', validators=[DataRequired()])
@@ -23,18 +27,20 @@ class PartySignup(Form):
     pokemon = MultiCheckboxField(u'pokemon', coerce=int)
 
     def validate_pokemon(self, field):
-        if len(field.data) != 6:
-            raise ValidationError('Choose 6 pokemon')
+        if len(field.data) > 6:
+            raise ValidationError('Choose 6 or fewer pokemon')
 
 class BattleSignup(Form):
-    #should add a validator to check no more than 6 pokemon are selected
-    pokemon = MultiCheckboxField(u'pokemon', validators=[DataRequired()], coerce=int)
+    pokemon = MultiCheckboxField(u'pokemon',
+                                 validators=[DataRequired()],
+                                 coerce=int)
 
     def validate_pokemon(self, field):
-        if len(field.data) != 6:
-            raise ValidationError('Choose 6 pokemon')
+        if len(field.data) > 6:
+            raise ValidationError('Choose 6 of fewer pokemon')
 
 class ServerManager(Form):
-    mode = SelectField(u'Game Mode', choices=[('party', 'party'),
+    mode = SelectField(u'Game Mode', choices=[('', ''),
+                                              ('party', 'party'),
                                               ('battle', 'battle')])
     purge = BooleanField(u'Purge')
