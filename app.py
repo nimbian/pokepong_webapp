@@ -1,9 +1,10 @@
 from __future__ import absolute_import, print_function
-from pokepong.app import app
-from pokepong.config import _cfg, _cfgi
+from pokepong.app import create_app
 
+
+DEBUG = True
+SECRET_KEY = 'development key'
+
+app = create_app(__name__)
 if __name__ == '__main__':
-    app.secret_key = _cfg("secret-key")
-    app.run(host=_cfg("debug-host"),
-            port=_cfgi('debug-port'),
-            debug=True)
+    app.run()
