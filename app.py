@@ -5,6 +5,6 @@ from pokepong.app import create_app
 DEBUG = True
 SECRET_KEY = 'development key'
 
-app = create_app(__name__)
+app = create_app()
 if __name__ == '__main__':
     app.run()
