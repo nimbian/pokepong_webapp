@@ -1,7 +1,10 @@
 from flask import Flask
 from flask.ext.login import  LoginManager
-from pokepong import config as c
+from flask_wtf.csrf import CsrfProtect
 
+
+csrf = CsrfProtect()
+login_manager = LoginManager()
 
 def create_app(config='pokepong.config', test=False):
 
@@ -9,7 +12,7 @@ def create_app(config='pokepong.config', test=False):
     app.config.from_object(config)
     if test:
         app.config.from_envvar('POKEPONG_SETTINGS')
-    login_manager = LoginManager()
+    csrf.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'pokepong.login'
 
