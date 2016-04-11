@@ -14,5 +14,12 @@ def init_db():
     Base.metadata.create_all(bind=engine)
     with engine.begin() as conn:
         with open('pokepong/pokemon.sql', 'r') as file_:
-            for line in file_:
-                conn.execute(line)
+            with conn.begin() as trans:
+                if engine.name == 'sqlite':
+                    conn.execute('PRAGMA foreign_keys=OFF;')
+                elif engine.name == 'postgresql':
+                    conn.execute('ALTER TABLE pokemon DISABLE TRIGGER ALL;')
+                for line in file_:
+                    conn.execute(line)
+                if engine.name == 'postgresql':
+                    conn.execute('ALTER TABLE pokemon ENABLE TRIGGER ALL;')
