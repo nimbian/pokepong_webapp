@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<form method="POST" action="/login">
+<form method="POST" action="{{ url_for('login') }}">
     {{ form.hidden_tag() }}
     {{ form.username.label }} {{ form.username }}
     {{ form.password.label }} {{ form.password }}
