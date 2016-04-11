@@ -46,11 +46,16 @@ def register():
             flash('Your passwords did not match, please try again')
             return render_template('register.html', form=form)
         trainer = Trainer(form.username.data, form.password1.data)
+        if Trainer.query.first() is None:
+            trainer.admin = True
+            flash('Congradulations as the first registered trainer, you are \
+an admin of the site')
         owned = Owned(form.pokemon.data)
         trainer.pokemon.append(owned)
         db.add(trainer)
         db.add(owned)
         db.commit()
+        flash('Welcome {}'.format(trainer.name))
         return redirect(url_for('.index'))
     return render_template('register.html', form=form)
 
@@ -77,6 +82,7 @@ def login():
 def logout():
     '''log user out and teardown the cookies'''
     logout_user()
+    flash('You were logged out')
     return redirect(url_for('.login'))
 
 @pokepong.route("/signup", methods=['get', 'post'])
@@ -84,6 +90,8 @@ def signup():
     '''signup for a new party battle or redirect user if in battle mode'''
     mode = r.get('mode')
     if mode == 'battle':
+        flash('game mode is currently set to battle, \
+if you want to party please have an admin change it')
         return redirect(url_for('.battle'))
     form = PartySignup()
     form.pokemon.choices = [(pokemon.id, pokemon.name)
@@ -106,7 +114,7 @@ def battle():
     '''register for a new battle or warn user if set to party'''
     mode = r.get('mode')
     if mode != 'battle':
-        flash('game mode is currently set to party,\
+        flash('game mode is currently set to party, \
 if you want to battle please have an admin change it')
         return redirect(url_for('.signup'))
     form = BattleSignup()
@@ -128,12 +136,21 @@ def admin():
         abort(401)
     form = ServerManager()
     #TODO:Maybe let admin jump the line ;)
+    #TODO:Way to make users admins
     if form.validate_on_submit():
         if form.mode.data != '':
             r.set('mode', form.mode.data)
             r.delete('lineup')
         if form.purge.data:
             r.delete('lineup')
+    form.admins.data = []
+    form.admins.choices = []
+    for trainer in Trainer.query.all():
+        if trainer:
+            form.admins.data.append(True)
+        else:
+            form.admins.data.append(False)
+        form.admins.choices.append((trainer.id, trainer.name))
     return render_template('manage.html', form=form)
 
 @pokepong.route("/pokemon", methods=['get', 'post'])
@@ -147,6 +164,8 @@ def lineup():
     mode = r.get('mode')
     if mode == 'party':
         teams = [json.loads(x) for x in r.lrange('lineup', 0, -1)]
+        if len(teams) == 0:
+            flash('nobody is queued up')
         return render_template('party_lineup.html', teams=teams)
     elif mode == 'battle':
         for team in r.lrange('lineup', 0, -1):
@@ -155,5 +174,7 @@ def lineup():
                                Owned.query.filter(
                                    Owned.id.in_(load['pokemon']))]
             teams.append(load)
+        if len(teams) == 0:
+            flash('nobody is queued up')
         return render_template('battle_lineup.html', teams=teams)
 
