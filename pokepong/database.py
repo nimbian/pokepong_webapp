@@ -19,5 +19,11 @@ def init_db():
         result = conn.execute("SELECT id FROM pokemon")
         if result.first() is None:
             with open('pokepong/pokemon.sql', 'r') as file_:
+                if engine.name == 'sqlite':
+                    conn.execute('PRAGMA foreign_keys=OFF;')
+                elif engine.name == 'postgresql':
+                    conn.execute('ALTER TABLE pokemon DISABLE TRIGGER ALL;')
                 for line in file_:
                     conn.execute(line)
+                if engine.name == 'postgresql':
+                    conn.execute('ALTER TABLE pokemon ENABLE TRIGGER ALL;')
