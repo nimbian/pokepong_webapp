@@ -3,10 +3,6 @@ from wtforms import StringField, PasswordField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired, ValidationError
 
 
-class MultiCheckboxField(SelectMultipleField):
-    widget = widgets.ListWidget(prefix_label=False)
-    option_widget = widgets.CheckboxInput()
-
 class Register(Form):
     username = StringField(u'username', validators=[DataRequired()])
     password1 = PasswordField(u'password1', validators=[DataRequired()])
@@ -24,16 +20,19 @@ class PartySignup(Form):
     teamname = StringField(u'Teamname', validators=[DataRequired()])
     player1 = StringField(u'Player 1', validators=[DataRequired()])
     player2 = StringField(u'Player 2', validators=[DataRequired()])
-    pokemon = MultiCheckboxField(u'pokemon', coerce=int)
+    pokemon = SelectMultipleField(u'pokemon',
+                                  coerce=int,
+                                  option_widget=widgets.CheckboxInput())
 
     def validate_pokemon(self, field):
         if len(field.data) > 6:
             raise ValidationError('Choose 6 or fewer pokemon')
 
 class BattleSignup(Form):
-    pokemon = MultiCheckboxField(u'pokemon',
-                                 validators=[DataRequired()],
-                                 coerce=int)
+    pokemon = SelectMultipleField(u'pokemon',
+                                  validators=[DataRequired()],
+                                  coerce=int,
+                                  option_widget=widgets.CheckboxInput())
 
     def validate_pokemon(self, field):
         if len(field.data) > 6:
@@ -44,3 +43,6 @@ class ServerManager(Form):
                                               ('party', 'party'),
                                               ('battle', 'battle')])
     purge = BooleanField(u'Purge')
+    admins = SelectMultipleField(u'admins',
+                                 coerce=int,
+                                 option_widget=widgets.CheckboxInput())
