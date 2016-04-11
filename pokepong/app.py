@@ -1,10 +1,11 @@
 from flask import Flask
-from flask.ext.login import  LoginManager
+from flask.ext.login import LoginManager
 from flask_wtf.csrf import CsrfProtect
 
 
 csrf = CsrfProtect()
 login_manager = LoginManager()
+
 
 def create_app(config='pokepong.config', test=False):
 

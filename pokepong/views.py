@@ -1,8 +1,21 @@
-from flask import render_template, redirect, request, jsonify, url_for, abort, flash, Blueprint, current_app
-from flask.ext.login import current_user, login_user, logout_user, login_required
+from flask import (render_template,
+                   redirect, request,
+                   url_for,
+                   abort,
+                   flash,
+                   Blueprint,
+                   current_app)
+from flask.ext.login import (current_user,
+                             login_user,
+                             logout_user,
+                             login_required)
 import json
 from random import randrange
-from pokepong.forms import Register, Login, PartySignup, BattleSignup, ServerManager
+from pokepong.forms import (Register,
+                            Login,
+                            PartySignup,
+                            BattleSignup,
+                            ServerManager)
 
 from pokepong.models import Trainer, Pokemon, Owned
 from pokepong.database import db
@@ -18,20 +31,24 @@ def load_user(trainer_id):
     '''Rehadrate the the user-session bassed on the id from cookie'''
     return Trainer.query.get(trainer_id)
 
+
 @current_app.before_first_request
 def init_redis():
     '''Set the mode to party when the app starts if not already set'''
     r.set('mode', 'party', nx=True)
+
 
 @current_app.teardown_appcontext
 def shutdown_session(dummy_exception=None):
     '''Teardown the db session after every request to reset it'''
     db.remove()
 
+
 @pokepong.route("/")
 def index():
     '''simple index landing page'''
     return render_template('index.html')
+
 
 @pokepong.route("/register", methods=['get', 'post'])
 def register():
@@ -59,6 +76,7 @@ an admin of the site')
         return redirect(url_for('.index'))
     return render_template('register.html', form=form)
 
+
 @pokepong.route("/login", methods=['get', 'post'])
 def login():
     '''Login the user'''
@@ -77,6 +95,7 @@ def login():
         return redirect(redir or url_for('.index'))
     return render_template('login.html', form=form)
 
+
 @pokepong.route("/logout")
 @login_required
 def logout():
@@ -84,6 +103,7 @@ def logout():
     logout_user()
     flash('You were logged out')
     return redirect(url_for('.login'))
+
 
 @pokepong.route("/signup", methods=['get', 'post'])
 def signup():
@@ -100,13 +120,14 @@ if you want to party please have an admin change it')
         pokemon = form.pokemon.data
         while len(pokemon) < 6:
             pokemon.append(randrange(150) + 1)
-        newteam = {'name' : form.teamname.data,
+        newteam = {'name': form.teamname.data,
                    'player1': form.player1.data,
                    'player2': form.player2.data,
                    'pokemon': pokemon}
         r.rpush('lineup', json.dumps(newteam))
         return redirect(url_for('.lineup'))
     return render_template('party_signup.html', form=form)
+
 
 @pokepong.route("/battle", methods=['get', 'post'])
 @login_required
@@ -122,11 +143,12 @@ if you want to battle please have an admin change it')
                             for pokemon in current_user.pokemon]
     base = [p.base_id for p in current_user.pokemon]
     if form.validate_on_submit():
-        newteam = {'name' : current_user.name,
+        newteam = {'name': current_user.name,
                    'pokemon': form.pokemon.data}
         r.rpush('lineup', json.dumps(newteam))
         return redirect(url_for('.lineup'))
     return render_template('battle_signup.html', form=form, base=base)
+
 
 @pokepong.route("/admin", methods=['get', 'post'])
 @login_required
@@ -135,8 +157,8 @@ def admin():
     if not current_user.admin:
         abort(401)
     form = ServerManager()
-    #TODO:Maybe let admin jump the line ;)
-    #TODO:Way to make users admins
+    # TODO:Maybe let admin jump the line ;)
+    # TODO:Way to make users admins
     if form.validate_on_submit():
         if form.mode.data != '':
             r.set('mode', form.mode.data)
@@ -153,10 +175,12 @@ def admin():
         form.admins.choices.append((trainer.id, trainer.name))
     return render_template('manage.html', form=form)
 
+
 @pokepong.route("/pokemon", methods=['get', 'post'])
 @login_required
 def view_pokemon():
     return render_template('pokemon.html', pokemon=current_user.pokemon)
+
 
 @pokepong.route("/lineup")
 def lineup():
@@ -177,4 +201,3 @@ def lineup():
         if len(teams) == 0:
             flash('nobody is queued up')
         return render_template('battle_lineup.html', teams=teams)
-

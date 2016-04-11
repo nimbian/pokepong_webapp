@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from flask import current_app
 engine = create_engine(current_app.config['CONNECTION_STRING'])
 db = scoped_session(sessionmaker(autocommit=False,
                                  autoflush=False,

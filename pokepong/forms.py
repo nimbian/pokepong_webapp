@@ -12,9 +12,11 @@ class Register(Form):
                          validators=[DataRequired()],
                          coerce=int)
 
+
 class Login(Form):
     username = StringField(u'username', validators=[DataRequired()])
     password = PasswordField(u'password', validators=[DataRequired()])
+
 
 class PartySignup(Form):
     teamname = StringField(u'Teamname', validators=[DataRequired()])
@@ -28,6 +30,7 @@ class PartySignup(Form):
         if len(field.data) > 6:
             raise ValidationError('Choose 6 or fewer pokemon')
 
+
 class BattleSignup(Form):
     pokemon = SelectMultipleField(u'pokemon',
                                   validators=[DataRequired()],
@@ -37,6 +40,7 @@ class BattleSignup(Form):
     def validate_pokemon(self, field):
         if len(field.data) > 6:
             raise ValidationError('Choose 6 of fewer pokemon')
+
 
 class ServerManager(Form):
     mode = SelectField(u'Game Mode', choices=[('', ''),
