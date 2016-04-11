@@ -179,9 +179,12 @@ class Owned(Base):
         self.base_id = base_id
         self.lvl = lvl
         x = LearnableMove.query.filter(
-            LearnableMove.learnedat < self.lvl) .filter(
+            LearnableMove.learnedat <= self.lvl) .filter(
                 LearnableMove.pokemon_id == self.base_id).all()
-        self.move1, self.move2, self.move3, self.move4 = (x[-4:]+([None] * 4))[:4]
+        tmp = []
+        for i in x[-4:]:
+            tmp.append(Move.query.filter(Move.id==i.move_id).one())
+        self.move1, self.move2, self.move3, self.move4 = (tmp+([None] * 4))[:4]
 
     @property
     def maxhp(self):

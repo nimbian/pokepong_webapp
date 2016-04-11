@@ -8,3 +8,4 @@ redis
 gunicorn
 autopep8
 Jinja2
+nose
