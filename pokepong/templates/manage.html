@@ -1,9 +1,12 @@
 {%extends "layout.html" %}
 {% block body %}
-<form method="post" action="{{ url_for('admin') }}">
+<form method="post" action="{{ url_for('.admin') }}">
     {{ form.hidden_tag() }}
     {{ form.mode.label }} {{ form.mode }}
     {{ form.purge.label }} {{ form.purge }}
+    {% for trainer in form.admins %}
+    {{ trainer.label }} {{ trainer }}
+    {% endfor %}
     <input type="submit" value="Go">
 </form>
 {% endblock %}
