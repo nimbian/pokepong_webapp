@@ -1,5 +1,5 @@
 import unittest
-from pokepong.app import create_app
+from pokeweb.app import create_app
 
 class Route(unittest.TestCase):
     TESTING = True
@@ -14,13 +14,13 @@ class Route(unittest.TestCase):
         self.test_client = self.app.test_client()
         self.register('validtrainer', 'validpass', 'validpass', 1)
         with self.app.app_context():
-            from pokepong.red import r
+            from pokeweb.red import r
             self.r = r
             self.r.flushdb()
 
     def tearDown(self):
         with self.app.app_context():
-            from pokepong.database import engine, db
+            from pokeweb.database import engine, db
             db.close()
             engine.dispose()
 

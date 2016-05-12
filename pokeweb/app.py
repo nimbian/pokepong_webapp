@@ -7,19 +7,19 @@ csrf = CsrfProtect()
 login_manager = LoginManager()
 
 
-def create_app(config='pokepong.config', testing=False):
+def create_app(config='pokeweb.config', testing=False):
 
     app = Flask(__name__)
     app.config.from_object(config)
     if not testing:
-        app.config.from_envvar('POKEPONG_SETTINGS')
+        app.config.from_envvar('POKEWEB_SETTINGS')
     csrf.init_app(app)
     login_manager.init_app(app)
-    login_manager.login_view = 'pokepong.login'
+    login_manager.login_view = 'pokeweb.login'
 
     with app.app_context():
-        from pokepong.views import pokepong
-        from pokepong.database import init_db
-        app.register_blueprint(pokepong)
+        from pokeweb.views import pokeweb
+        from pokeweb.database import init_db
+        app.register_blueprint(pokeweb)
         init_db()
     return app

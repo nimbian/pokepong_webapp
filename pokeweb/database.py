@@ -12,12 +12,12 @@ Base = declarative_base()
 Base.query = db.query_property()
 
 def init_db():
-    import pokepong.models
+    import pokeweb.models
     Base.metadata.create_all(bind=engine)
     with engine.begin() as conn:
         result = conn.execute("SELECT id FROM pokemon")
         if result.first() is None:
-            with open('pokepong/pokemon.sql', 'r') as file_:
+            with open('pokeweb/pokemon.sql', 'r') as file_:
                 if engine.name == 'sqlite':
                     conn.execute('PRAGMA foreign_keys=OFF;')
                 elif engine.name == 'postgresql':

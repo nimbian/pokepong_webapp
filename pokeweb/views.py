@@ -11,17 +11,17 @@ from flask.ext.login import (current_user,
                              login_user,
                              logout_user,
                              login_required)
-from pokepong.forms import (Register,
+from pokeweb.forms import (Register,
                             Login,
                             PartySignup,
                             BattleSignup,
                             ServerManager)
 
-from pokepong.models import Trainer, Pokemon, Owned
-from pokepong.database import db
-from pokepong.red import r
+from pokeweb.models import Trainer, Pokemon, Owned
+from pokeweb.database import db
+from pokeweb.red import r
 
-pokepong = Blueprint('pokepong', __name__,
+pokeweb = Blueprint('pokeweb', __name__,
                      template_folder='templates',
                      static_folder='static')
 
@@ -44,13 +44,13 @@ def shutdown_session(dummy_exception=None):
     db.remove()
 
 
-@pokepong.route("/")
+@pokeweb.route("/")
 def index():
     '''simple index landing page'''
     return render_template('index.html')
 
 
-@pokepong.route("/register", methods=['get', 'post'])
+@pokeweb.route("/register", methods=['get', 'post'])
 def register():
     '''Regester the user'''
     form = Register()
@@ -77,7 +77,7 @@ an admin of the site')
     return render_template('register.html', form=form)
 
 
-@pokepong.route("/login", methods=['get', 'post'])
+@pokeweb.route("/login", methods=['get', 'post'])
 def login():
     '''Login the user'''
     form = Login()
@@ -96,7 +96,7 @@ def login():
     return render_template('login.html', form=form)
 
 
-@pokepong.route("/logout")
+@pokeweb.route("/logout")
 @login_required
 def logout():
     '''log user out and teardown the cookies'''
@@ -105,7 +105,7 @@ def logout():
     return redirect(url_for('.login'))
 
 
-@pokepong.route("/signup", methods=['get', 'post'])
+@pokeweb.route("/signup", methods=['get', 'post'])
 def signup():
     '''signup for a new party battle or redirect user if in battle mode'''
     mode = r.get('mode')
@@ -130,7 +130,7 @@ if you want to party please have an admin change it')
     return render_template('party_signup.html', form=form)
 
 
-@pokepong.route("/battle", methods=['get', 'post'])
+@pokeweb.route("/battle", methods=['get', 'post'])
 @login_required
 def battle():
     '''register for a new battle or warn user if set to party'''
@@ -151,7 +151,7 @@ if you want to battle please have an admin change it')
     return render_template('battle_signup.html', form=form, base=base)
 
 
-@pokepong.route("/admin", methods=['get', 'post'])
+@pokeweb.route("/admin", methods=['get', 'post'])
 @login_required
 def admin():
     '''simple admin page'''
@@ -177,13 +177,13 @@ def admin():
     return render_template('manage.html', form=form)
 
 
-@pokepong.route("/pokemon", methods=['get', 'post'])
+@pokeweb.route("/pokemon", methods=['get', 'post'])
 @login_required
 def view_pokemon():
     return render_template('pokemon.html', pokemon=current_user.pokemon)
 
 
-@pokepong.route("/lineup")
+@pokeweb.route("/lineup")
 def lineup():
     teams = []
     mode = r.get('mode')

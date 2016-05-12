@@ -11,7 +11,7 @@ from sqlalchemy import (Column,
                         Float)
 from sqlalchemy.orm import relationship, backref
 from flask.ext.login import UserMixin
-from pokepong.database import Base
+from pokeweb.database import Base
 import bcrypt
 
 
