@@ -1,0 +1,12 @@
+Flask
+Flask-Login
+Flask-WTF
+Flask-Bcrypt
+SQLalchemy
+flake8
+redis
+gunicorn
+autopep8
+Jinja2
+nose
+pylint
