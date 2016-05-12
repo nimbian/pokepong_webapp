@@ -7,11 +7,11 @@ csrf = CsrfProtect()
 login_manager = LoginManager()
 
 
-def create_app(config='pokepong.config', test=False):
+def create_app(config='pokepong.config', testing=False):
 
     app = Flask(__name__)
     app.config.from_object(config)
-    if test:
+    if not testing:
         app.config.from_envvar('POKEPONG_SETTINGS')
     csrf.init_app(app)
     login_manager.init_app(app)
