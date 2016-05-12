@@ -3,9 +3,6 @@ Flask-Login
 Flask-WTF
 Flask-Bcrypt
 SQLalchemy
-pep8
 redis
 gunicorn
-autopep8
 Jinja2
-nose
