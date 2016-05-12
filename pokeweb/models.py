@@ -194,6 +194,10 @@ class Owned(Base):
         for i in x[-4:]:
             tmp.append(Move.query.filter(Move.id==i.move_id).one())
         self.move1, self.move2, self.move3, self.move4 = (tmp+([None] * 4))[:4]
+        self.exp = {'f': int(4 * self.lvl ** 3 / 5.),
+                    'mf': self.lvl ** 3,
+                    'ms': int(6/5. * self.lvl ** 3 - 15 * self.lvl ** 2 + 100 * self.lvl - 140),
+                    's': int(5 * self.lvl ** 3 / 4.)}[self.base.lvlspeed]
 
     @property
     def maxhp(self):
