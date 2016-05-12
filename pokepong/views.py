@@ -1,3 +1,5 @@
+import json
+from random import randrange
 from flask import (render_template,
                    redirect, request,
                    url_for,
@@ -9,8 +11,6 @@ from flask.ext.login import (current_user,
                              login_user,
                              logout_user,
                              login_required)
-import json
-from random import randrange
 from pokepong.forms import (Register,
                             Login,
                             PartySignup,
@@ -115,7 +115,8 @@ if you want to party please have an admin change it')
         return redirect(url_for('.battle'))
     form = PartySignup()
     form.pokemon.choices = [(pokemon.id, pokemon.name)
-                            for pokemon in Pokemon.query.order_by(Pokemon.id).limit(151)]
+                            for pokemon in Pokemon.query.order_by(
+                                Pokemon.id).limit(151)]
     if form.validate_on_submit():
         pokemon = form.pokemon.data
         while len(pokemon) < 6:
