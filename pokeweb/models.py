@@ -185,6 +185,7 @@ class Owned(Base):
     pp4 = Column(Integer, default=0)
 
     def __init__(self, base_id, lvl=5):
+        self.base = Pokemon.query.get(base_id)
         self.base_id = base_id
         self.lvl = lvl
         x = LearnableMove.query.filter(
