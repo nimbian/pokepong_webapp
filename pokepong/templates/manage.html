@@ -4,9 +4,11 @@
     {{ form.hidden_tag() }}
     {{ form.mode.label }} {{ form.mode }}
     {{ form.purge.label }} {{ form.purge }}
+    <ul>
     {% for trainer in form.admins %}
-    {{ trainer.label }} {{ trainer }}
+        <li>{{ trainer.label }} {{ trainer }}</li>
     {% endfor %}
+    </ul>
     <input type="submit" value="Go">
 </form>
 {% endblock %}
