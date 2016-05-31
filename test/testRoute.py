@@ -63,7 +63,8 @@ class Route(unittest.TestCase):
     def admin_change(self, mode='', purge=False):
         return self.test_client.post('/admin', data=dict(
             mode=mode,
-            purge=purge), follow_redirects=False)
+            purge=purge,
+        admins=[1]), follow_redirects=False)
 
     def test_login_logout(self):
         rv = self.login('validtrainer', 'validpass')
