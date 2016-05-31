@@ -43,6 +43,19 @@ class TmHm(Base):
     move_id = Column(Integer, ForeignKey('move.id'), nullable=False)
     move = relationship('Move', backref=backref('TmHm', uselist=False))
 
+class Caught(Base):
+    __tablename__ = 'caught'
+    id = Column(Integer, primary_key=True)
+    trainer_id = Column(Integer, ForeignKey('trainer.id'))
+    trainer = relationship('Trainer', backref='caught')
+    pokemon_id = Column(Integer, ForeignKey('pokemon.id'))
+    pokemon = relationship('Pokemon')
+    seen = Column(Boolean, default = True)
+    caught = Column(Boolean, default = False)
+
+    def __init__(self, trainer, pokemon_id):
+        self.trainer = trainer
+        self.pokemon_id = pokemon_id
 
 class Type(Base):
     '''Lookup class the defines all the pokemon and move types'''
@@ -109,6 +122,19 @@ class Trainer(Base, UserMixin):
     admin = Column(Boolean)
     created = Column(DateTime)
     money = Column(Integer, default=1500)
+    bb = Column(Boolean, default=False)
+    cb = Column(Boolean, default=False)
+    tb = Column(Boolean, default=False)
+    rb = Column(Boolean, default=False)
+    sb = Column(Boolean, default=False)
+    mb = Column(Boolean, default=False)
+    vb = Column(Boolean, default=False)
+    eb = Column(Boolean, default=False)
+    e1 = Column(Boolean, default=False)
+    e2 = Column(Boolean, default=False)
+    e3 = Column(Boolean, default=False)
+    e4 = Column(Boolean, default=False)
+    champion = Column(Boolean, default=False)
 
     def __init__(self, name, password, admin=False):
         self.name = name

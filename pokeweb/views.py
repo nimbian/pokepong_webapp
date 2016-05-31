@@ -17,7 +17,7 @@ from pokeweb.forms import (Register,
                             BattleSignup,
                             ServerManager)
 
-from pokeweb.models import Trainer, Pokemon, Owned
+from pokeweb.models import Trainer, Pokemon, Owned, Caught
 from pokeweb.database import db
 from pokeweb.red import r
 
@@ -68,8 +68,11 @@ def register():
             flash('Congradulations as the first registered trainer, you are \
 an admin of the site')
         owned = Owned(form.pokemon.data)
+        caught = Caught(trainer, form.pokemon.data)
+        caught.caught = True
         trainer.pokemon.append(owned)
         db.add(trainer)
+        db.add(caught)
         db.add(owned)
         db.commit()
         flash('Welcome {}'.format(trainer.name))
