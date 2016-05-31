@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 {% block body %}
-<form method="post" action="{{ url_for('.battle') }}">
+<form method="post" action="{{ url_for('.battle') }}" class='test'>
     {{ form.hidden_tag() }}
-    <ul>
+    <input type="submit" value="Go">
+    <ul style="margin-top: 35px" >
     {% for pokemon in form.pokemon %}
-        <li style="float: left; margin-left: 50px">{{ pokemon }}
-            <i style="margin-top: 35px" class="sprite sprite-{{ base[loop.index0] }}"></i>
+        <li onclick="test({{ loop.index0 }} + 1);" style="float: left; margin-right:56px; margin-bottom:56px;">{{ pokemon }}
+            <i class="sprite sprite-{{ base[loop.index0] }}"></i>
         </li>
     {% endfor %}
     </ul>
-    <input type="submit" value="Go">
 </form>
 {% endblock %}

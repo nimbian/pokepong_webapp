@@ -5,15 +5,15 @@
     {{ form.teamname.label }} {{ form.teamname }}
     {{ form.player1.label }} {{ form.player1 }}
     {{ form.player2.label }} {{ form.player2 }}
-    <ul>
+    <input type="submit" value="Go">
+    <ul style="margin-top: 35px" >
     {% for pokemon in form.pokemon %}
-    <li onclick="test({{ pokemon.data }});" style="float: left; margin-left: 50px; margin-top: 35px">{{ pokemon }}
-            <i style="margin-top: 35px" class="sprite sprite-{{ pokemon.data }}"></i>
+    <li onclick="test({{ pokemon.data }});" style="float: left; margin-right:56px; margin-bottom:56px;">{{ pokemon }}
+            <i class="sprite sprite-{{ pokemon.data }}"></i>
         </li>
 
     {% endfor %}
     </ul>
 
-    <input type="submit" value="Go">
 </form>
 {% endblock %}
