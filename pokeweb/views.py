@@ -112,7 +112,7 @@ def logout():
 def signup():
     '''signup for a new party battle or redirect user if in battle mode'''
     mode = r.get('mode')
-    if mode == 'battle':
+    if mode != 'pong':
         flash('game mode is currently set to battle, \
 if you want to party please have an admin change it')
         return redirect(url_for('.battle'))
@@ -138,7 +138,7 @@ if you want to party please have an admin change it')
 def battle():
     '''register for a new battle or warn user if set to party'''
     mode = r.get('mode')
-    if mode != 'battle':
+    if mode == 'pong':
         flash('game mode is currently set to party, \
 if you want to battle please have an admin change it')
         return redirect(url_for('.signup'))
@@ -194,17 +194,25 @@ def view_pokemon():
 def lineup():
     teams = []
     mode = r.get('mode')
-    if mode == 'party':
+    if mode == 'pong':
         teams = [json.loads(x) for x in r.lrange('lineup', 0, -1)]
         if len(teams) == 0:
             flash('nobody is queued up')
         return render_template('party_lineup.html', teams=teams)
-    elif mode == 'battle':
+    elif mode == 'wild':
         for team in r.lrange('lineup', 0, -1):
             load = dict(json.loads(team))
             load['pokemon'] = [pokemon.base_id for pokemon in
                                Owned.query.filter(
                                    Owned.id.in_(load['pokemon']))]
+            teams.append(load)
+        if len(teams) == 0:
+            flash('nobody is queued up')
+        return render_template('battle_lineup.html', teams=teams)
+    elif mode == 'battle':
+        for team in r.lrange('lineup', 0, -1):
+            load = dict(json.loads(team))
+            load['pokemon'] = []
             teams.append(load)
         if len(teams) == 0:
             flash('nobody is queued up')

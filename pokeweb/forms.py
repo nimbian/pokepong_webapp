@@ -44,8 +44,9 @@ class BattleSignup(Form):
 
 class ServerManager(Form):
     mode = SelectField(u'Game Mode', choices=[('', ''),
-                                              ('party', 'party'),
-                                              ('battle', 'battle')])
+                                              ('pong', 'party'),
+                                              ('battle', 'battle'),
+                                              ('wild', 'campaign')])
     purge = BooleanField(u'Purge')
     admins = SelectMultipleField(u'admins',
                                  coerce=int,
