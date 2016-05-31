@@ -910,3 +910,20 @@
     height: 56px;
     background-position: -797px -401px;
 }
+
+.test input[type=checkbox] {
+    display: none;
+}
+
+.test i {
+    background-color: red;
+}
+
+.test input[type=checkbox]:checked + i {
+    background-color: green;
+}
+
+ul
+{
+    list-style-type: none;
+}
