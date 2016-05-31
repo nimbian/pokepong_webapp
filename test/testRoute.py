@@ -1,5 +1,5 @@
 import unittest
-from pokepong.app import create_app
+from pokeweb.app import create_app
 
 class Route(unittest.TestCase):
     TESTING = True
@@ -10,17 +10,17 @@ class Route(unittest.TestCase):
 
     def setUp(self):
         self.CONNECTION_STRING = 'sqlite://'
-        self.app = create_app(self, test=True)
+        self.app = create_app(self, testing=True)
         self.test_client = self.app.test_client()
-        rv = self.register('validtrainer', 'validpass', 'validpass', 1)
+        self.register('validtrainer', 'validpass', 'validpass', 1)
         with self.app.app_context():
-            from pokepong.red import r
+            from pokeweb.red import r
             self.r = r
             self.r.flushdb()
 
     def tearDown(self):
         with self.app.app_context():
-            from pokepong.database import engine, db
+            from pokeweb.database import engine, db
             db.close()
             engine.dispose()
 
@@ -60,6 +60,11 @@ class Route(unittest.TestCase):
     def lineup(self):
         return self.test_client.get('/lineup')
 
+    def admin_change(self, mode='', purge=False):
+        return self.test_client.post('/admin', data=dict(
+            mode=mode,
+            purge=purge), follow_redirects=False)
+
     def test_login_logout(self):
         rv = self.login('validtrainer', 'validpass')
         assert 'You were logged in' in rv.data
@@ -93,7 +98,7 @@ if you want to party please have an admin change it' in rv.data
     def test_battle_signup(self):
         self.set_mode('battle')
         self.login('validtrainer', 'validpass')
-        #First pokemon will happen to be 152, but could make more robust
+        #TODO: First pokemon will happen to be 152, but could make more robust
         rv = self.battle_signup([152])
         assert '<th> 1 </th>' in rv.data
         assert '<td> validtrainer </td>' in rv.data
@@ -110,3 +115,17 @@ if you want to battle please have an admin change it' in rv.data
         self.set_mode('battle')
         rv = self.lineup()
         assert 'nobody is queued up' in rv.data
+
+    def test_admin(self):
+        self.register('validtrainer2', 'validpass2', 'validpass2', 1)
+        self.login('validtrainer2', 'validpass2')
+        rv = self.admin_change()
+        assert rv.status_code == 401
+        self.logout()
+        self.login('validtrainer', 'validpass')
+        rv = self.test_client.get('/admin')
+        assert rv.status_code == 200
+        rv = self.admin_change(mode='battle')
+        assert rv.status_code == 200
+        rv = self.admin_change(purge=True)
+        assert rv.status_code == 200

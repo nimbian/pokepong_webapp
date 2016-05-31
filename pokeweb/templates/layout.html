@@ -2,14 +2,14 @@
 <html lang="en">
     <head>
         <title>Pokepong</title>
-        <link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/jquery-ui.min.css') }}>
-        <link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/stylesheet.css') }}>
-        <link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/bootstrap.min.css') }}>
-        <link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'css/bootstrap-theme.min.css') }}>
-        <link rel="shortcut icon" href= {{ url_for('static', filename = 'images/favicon.ico') }}>
-        <script src= {{ url_for('static', filename = 'js/jquery-2.2.0.min.js') }}></script>
-        <script src= {{ url_for('static', filename = 'js/jquery-ui.min.js') }}></script>
-        <script src= {{ url_for('static', filename = 'js/bootstrap.min.js') }}></script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/jquery-ui.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/stylesheet.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/bootstrap.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'css/bootstrap-theme.min.css') }}">
+        <link rel="shortcut icon" href= "{{ url_for('static', filename = 'images/favicon.ico') }}">
+        <script src="{{ url_for('static', filename = 'js/jquery-2.2.0.min.js') }}"></script>
+        <script src="{{ url_for('static', filename = 'js/jquery-ui.min.js') }}"></script>
+        <script src="{{ url_for('static', filename = 'js/bootstrap.min.js') }}"></script>
     </head>
     <div class="page container">
     <h1>Pokepong</h1>
@@ -18,11 +18,8 @@
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Brand</a>
+                <a class="navbar-brand" href="{{ url_for('.index') }}">Home</a>
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
