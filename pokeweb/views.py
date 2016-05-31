@@ -172,7 +172,9 @@ def admin():
         form.admins.choices.append((trainer.id, trainer.name))
     if form.validate_on_submit():
         if form.mode.data != '':
-            r.delete('lineup')
+            if r.get('mode') != form.mode.data:
+                r.delete('lineup')
+                r.set('mode', form.mode.data)
         if form.purge.data:
             r.delete('lineup')
         for i in Trainer.query.all():
