@@ -162,21 +162,23 @@ def admin():
         abort(401)
     form = ServerManager()
     # TODO:Maybe let admin jump the line ;)
-    # TODO:Way to make users admins
+    if request.method == 'GET':
+        form.admins.data = []
+    form.admins.choices = []
+    for trainer in Trainer.query.all():
+        if request.method == 'GET':
+            if trainer.admin:
+                form.admins.data.append(trainer.id)
+        form.admins.choices.append((trainer.id, trainer.name))
     if form.validate_on_submit():
         if form.mode.data != '':
-            r.set('mode', form.mode.data)
             r.delete('lineup')
         if form.purge.data:
             r.delete('lineup')
-    form.admins.data = []
-    form.admins.choices = []
-    for trainer in Trainer.query.all():
-        if trainer:
-            form.admins.data.append(True)
-        else:
-            form.admins.data.append(False)
-        form.admins.choices.append((trainer.id, trainer.name))
+        for i in Trainer.query.all():
+            if i.id not in form.admins.data:
+                i.admin = False
+        db.commit()
     return render_template('manage.html', form=form)
 
 
