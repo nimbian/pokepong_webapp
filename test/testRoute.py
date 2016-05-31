@@ -85,7 +85,7 @@ class Route(unittest.TestCase):
         assert 'Your passwords did not match, please try again' in rv.data
 
     def test_party_signup(self):
-        self.set_mode('party')
+        self.set_mode('pong')
         rv = self.party_signup('testteam1', 'testplayer1', 'testplayer2')
         assert '<th> 1 </th>' in rv.data
         assert '<td> testteam1 </td>' in rv.data
@@ -103,14 +103,13 @@ if you want to party please have an admin change it' in rv.data
         rv = self.battle_signup([152])
         assert '<th> 1 </th>' in rv.data
         assert '<td> validtrainer </td>' in rv.data
-        assert 'class="sprite sprite-1"' in rv.data
-        self.set_mode('party')
+        self.set_mode('pong')
         rv = self.battle_signup([152])
         assert 'game mode is currently set to party, \
 if you want to battle please have an admin change it' in rv.data
 
     def test_empty_linup(self):
-        self.set_mode('party')
+        self.set_mode('pong')
         rv = self.lineup()
         assert 'nobody is queued up' in rv.data
         self.set_mode('battle')

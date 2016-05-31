@@ -35,7 +35,7 @@ def load_user(trainer_id):
 @current_app.before_first_request
 def init_redis():
     '''Set the mode to party when the app starts if not already set'''
-    r.set('mode', 'party', nx=True)
+    r.set('mode', 'pong', nx=True)
 
 
 @current_app.teardown_appcontext
