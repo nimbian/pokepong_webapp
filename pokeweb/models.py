@@ -213,6 +213,7 @@ class Owned(Base):
     def __init__(self, base_id, lvl=5):
         self.base = Pokemon.query.get(base_id)
         self.base_id = base_id
+        self.name = self.base.name
         self.lvl = lvl
         x = LearnableMove.query.filter(
             LearnableMove.learnedat <= self.lvl) .filter(

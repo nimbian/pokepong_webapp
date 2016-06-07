@@ -180,6 +180,8 @@ def admin():
         for i in Trainer.query.all():
             if i.id not in form.admins.data:
                 i.admin = False
+            else:
+                i.admin = True
         db.commit()
     return render_template('manage.html', form=form)
 
