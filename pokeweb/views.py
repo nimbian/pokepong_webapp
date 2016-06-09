@@ -151,7 +151,7 @@ if you want to battle please have an admin change it')
     if mode == 'battle':
         form.pokemon.choices = [(pokemon.id, pokemon.name)
                                 for pokemon in current_user.pokemon
-                                if pokemon.lvl >= int(r.get('min_level')) and pokemon.lvl <= int(r.get('max_level'))]
+                                if pokemon.lvl >= int(r.get('min_level') or 0) and pokemon.lvl <= int(r.get('max_level') or 100)]
     else:
         form.pokemon.choices = [(pokemon.id, pokemon.name)
                                 for pokemon in current_user.pokemon]
