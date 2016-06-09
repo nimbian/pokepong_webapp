@@ -11,8 +11,8 @@ def create_app(config='pokeweb.config', testing=False):
 
     app = Flask(__name__)
     app.config.from_object(config)
-    if not testing:
-        app.config.from_envvar('POKEWEB_SETTINGS')
+    #if not testing:
+    #    app.config.from_envvar('POKEWEB_SETTINGS')
     csrf.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'pokeweb.login'

@@ -1,6 +1,7 @@
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, SelectField, SelectMultipleField, widgets, BooleanField, RadioField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms import StringField, PasswordField, SelectField, SelectMultipleField, widgets, BooleanField, RadioField, IntegerField
+from wtforms.validators import DataRequired, ValidationError, NumberRange, optional
+from red import r
 
 
 class Register(Form):
@@ -38,8 +39,8 @@ class BattleSignup(Form):
                                   option_widget=widgets.CheckboxInput())
 
     def validate_pokemon(self, field):
-        if len(field.data) > 6:
-            raise ValidationError('Choose 6 of fewer pokemon')
+        if len(field.data) > r.get('max_count'):
+            raise ValidationError('Choose {0} of fewer pokemon'.format(r.get('max_count')))
 
 
 class ServerManager(Form):
@@ -48,6 +49,12 @@ class ServerManager(Form):
                                               ('battle', 'battle'),
                                               ('wild', 'campaign')])
     purge = BooleanField(u'Purge')
+    max_level = IntegerField('Max Level', [NumberRange(min=0, max=100), optional()])
+    min_level = IntegerField('Min Level', [NumberRange(min=0, max=100), optional()])
+    max_count = SelectField(u'Max pkmn count', choices=[('6','6'),('5','5'),('4','4'),
+                                                        ('3','3'),('2','2'),('1','1')])
     admins = SelectMultipleField(u'admins',
                                  coerce=int,
                                  option_widget=widgets.CheckboxInput())
+class Release(Form):
+    pass

@@ -4,6 +4,11 @@
     {{ form.hidden_tag() }}
     {{ form.mode.label }} {{ form.mode }}
     {{ form.purge.label }} {{ form.purge }}
+    <br>
+    {{ form.min_level.label }} {{ form.min_level}}
+    {{ form.max_level.label }} {{ form.max_level}}
+    <br>
+    {{ form.max_count.label }} {{ form.max_count}}
     <ul>
     {% for trainer in form.admins %}
         <li>{{ trainer.label }} {{ trainer }}</li>

@@ -101,7 +101,6 @@ if you want to party please have an admin change it' in rv.data
         self.login('validtrainer', 'validpass')
         #TODO: First pokemon will happen to be 152, but could make more robust
         rv = self.battle_signup([152])
-        assert '<th> 1 </th>' in rv.data
         assert '<td> validtrainer </td>' in rv.data
         self.set_mode('pong')
         rv = self.battle_signup([152])

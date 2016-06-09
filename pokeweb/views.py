@@ -15,7 +15,8 @@ from pokeweb.forms import (Register,
                             Login,
                             PartySignup,
                             BattleSignup,
-                            ServerManager)
+                            ServerManager,
+                            Release)
 
 from pokeweb.models import Trainer, Pokemon, Owned, Caught
 from pokeweb.database import db
@@ -36,6 +37,9 @@ def load_user(trainer_id):
 def init_redis():
     '''Set the mode to party when the app starts if not already set'''
     r.set('mode', 'pong', nx=True)
+    r.set('min_level', 0, nx=True)
+    r.set('max_level', 100, nx=True)
+    r.set('max_count', 6, nx=True)
 
 
 @current_app.teardown_appcontext
@@ -143,8 +147,14 @@ def battle():
 if you want to battle please have an admin change it')
         return redirect(url_for('.signup'))
     form = BattleSignup()
-    form.pokemon.choices = [(pokemon.id, pokemon.name)
-                            for pokemon in current_user.pokemon]
+    print mode
+    if mode == 'battle':
+        form.pokemon.choices = [(pokemon.id, pokemon.name)
+                                for pokemon in current_user.pokemon
+                                if pokemon.lvl >= int(r.get('min_level')) and pokemon.lvl <= int(r.get('max_level'))]
+    else:
+        form.pokemon.choices = [(pokemon.id, pokemon.name)
+                                for pokemon in current_user.pokemon]
     base = [p.base_id for p in current_user.pokemon]
     if form.validate_on_submit():
         newteam = {'name': current_user.name,
@@ -152,6 +162,49 @@ if you want to battle please have an admin change it')
         r.rpush('lineup', json.dumps(newteam))
         return redirect(url_for('.lineup'))
     return render_template('battle_signup.html', form=form, base=base)
+
+
+@pokeweb.route("/pkmn")
+@login_required
+def pkmn():
+    '''Shows all pkmn for a user'''
+    pokemon = [(pokemon.id, pokemon.name)
+               for pokemon in current_user.pokemon]
+    base = [p.base_id for p in current_user.pokemon]
+    return render_template('pkmn.html', pokemon=pokemon, base=base)
+
+
+@pokeweb.route("/pkmn/<pkmn>", methods=['get', 'post'])
+@login_required
+def stats(pkmn):
+    '''Shows all pkmn for a user'''
+    form = Release()
+    ids = [pokemon.id for pokemon in current_user.pokemon]
+    if int(pkmn) not in ids:
+        flash('You do no own this pokemon')
+        return redirect(url_for('.pkmn'))
+    pokemon = Owned.query.get(int(pkmn))
+    pokemon.load_stats()
+    stats = [pokemon.maxhp,pokemon.attack,pokemon.defense,pokemon.speed,pokemon.special]
+    types = [pokemon.base.type1, pokemon.base.type2]
+    moves = []
+    moves.append([pokemon.move1.name,pokemon.move1.maxpp+pokemon.pp1])
+    if pokemon.move2:
+        moves.append([pokemon.move2.name,pokemon.move2.maxpp+pokemon.pp2])
+    if pokemon.move3:
+        moves.append([pokemon.move3.name,pokemon.move3.maxpp+pokemon.pp3])
+    if pokemon.move4:
+        moves.append([pokemon.move4.name,pokemon.move4.maxpp+pokemon.pp4])
+    if form.validate_on_submit():
+        if len(current_user.pokemon) <= 1:
+            flash('Cannot release your last pokemon')
+            return redirect(url_for('.pkmn'))
+        else:
+            flash('{0} was released into the wild'.format(pokemon.name))
+            db.delete(pokemon)
+            db.commit()
+            return redirect(url_for('.pkmn'))
+    return render_template('stats.html', form=form, pokemon=pkmn, stats=stats, types=types, moves=moves, base=pokemon.base.id, name=pokemon.name)
 
 
 @pokeweb.route("/admin", methods=['get', 'post'])
@@ -183,6 +236,15 @@ def admin():
             else:
                 i.admin = True
         db.commit()
+        r.set('max_count', form.max_count.data)
+        if form.min_level.data != None:
+            r.set('min_level', form.min_level.data)
+        else:
+            r.set('min_level', 0)
+        if form.max_level.data != None:
+            r.set('max_level', form.max_level.data)
+        else:
+             r.set('max_level', 100)
     return render_template('manage.html', form=form)
 
 

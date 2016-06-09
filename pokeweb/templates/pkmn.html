@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+<form method="post" action="{{ url_for('.pkmn') }}" class='test'>
+    <ul style="margin-top: 35px" >
+    {% for pokemon in pokemon %}
+    <li style="float: left; margin-right:56px; margin-bottom:56px;">
+        <a href={{ url_for('.stats', pkmn=pokemon[0]) }} class="sprite sprite-{{ base[loop.index0] }}"></a>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

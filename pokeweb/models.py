@@ -232,8 +232,22 @@ class Owned(Base):
         I = [0, 8][self.attackiv % 2] + [0, 4][self.defenseiv % 2] +\
             [0, 2][self.speediv % 2] + [0, 1][self.specialiv % 2]
         E = min(63, int(floor(floor((max(0, self.hpev-1)**.5)+1)/4.)))
-        stat = floor((2 * self.base.hp + I + E) * self.lvl / 100. + self.lvl)
+        stat = int(floor((2 * self.base.hp + I + E) * self.lvl / 100. + self.lvl + 10))
         return stat
+
+    def load_stats(self):
+        self.hp = self.maxhp
+        self.attack = self.calcstat(self.base.attack, self.attackev, self.attackiv)
+        self.defense = self.calcstat(self.base.defense, self.defenseev, self.defenseiv)
+        self.special = self.calcstat(self.base.special, self.specialev, self.specialiv)
+        self.speed = self.calcstat(self.base.speed, self.speedev, self.speediv)
+
+    def calcstat(self, stat, E, I):
+        E = min(63,int(floor(floor((max(0, E-1)**.5)+1)/4.)))
+        stat = floor((2 * stat + I + E) * self.lvl / 100. + 5)
+        return int(stat)
+
+
 
 
 class OwnedItem(Base):

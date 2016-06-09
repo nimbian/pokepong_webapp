@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block body %}
+<form method="post" action="{{ url_for('.stats', pkmn=pokemon) }}">
+    {{ form.hidden_tag() }}
+    <i style="margin-bottom: 35px" class="sprite sprite-{{ base }}"></i>
+    HP: {{ stats[0] }}
+    <br>
+    ATTACK: {{ stats[1] }}
+    <br>
+    DEFENSE: {{ stats[2] }}
+    <br>
+    SPEED: {{ stats[3] }}
+    <br>
+    SPECIAL: {{ stats[4] }}
+    <br>
+    <ul>
+    MOVES:
+    {% for move in moves %}
+        <li> {{ move[0] }}     PP: {{ move[1] }}</li>
+    {% endfor %}
+    </ul>
+    <input type="submit" value="Release" onclick="return confirm('Are you sure you want to release {{ name }}')">
+</form>
+{% endblock %}

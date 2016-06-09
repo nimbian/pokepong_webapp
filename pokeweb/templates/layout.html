@@ -29,6 +29,11 @@
                         <ul class="dropdown-menu">
                             <li><a href="{{ url_for('.signup') }}">Signup</a></li>
                             <li><a href="{{ url_for('.lineup') }}">Lineup</a></li>
+                            {% if current_user.is_authenticated %}
+                            <li>
+                                <a href="{{ url_for('.pkmn') }}">My Pokemon</a>
+                            </li>
+                            {% endif %}
                         </ul>
                     </li>
                 </ul>
